@@ -23,7 +23,7 @@
     "crypto-ld": "^3.5.2",
     "jsonld": "^1.6.2",
     "jsonld-signatures": "^4.0.1",
-    "ocapld": "^1.2.0",
+    "ocapld": "^1.3.0",
     "http-signature-header": "^1.3.0"
   },
   "devDependencies": {

@@ -12,7 +12,8 @@ import {TextEncoder, base64Decode} from './util.js';
 
 export async function verifyCapabilityInvocation({
   url, method, headers, getInvokedCapability, documentLoader,
-  expectedHost, expectedTarget, expectedAction, suite, additionalHeaders = []
+  expectedHost, expectedTarget, expectedRootCapability,
+  expectedAction, suite, additionalHeaders = []
 }) {
   if(!getInvokedCapability) {
     throw new TypeError(
@@ -94,6 +95,7 @@ export async function verifyCapabilityInvocation({
   // until the file received hits the limit, so that won't happen here
   const purpose = new CapabilityInvocation({
     expectedTarget,
+    expectedRootCapability,
     expectedAction,
     suite
   });
