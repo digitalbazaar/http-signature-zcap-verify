@@ -6,7 +6,7 @@
 import {LDKeyPair} from 'crypto-ld';
 import {frame} from 'jsonld';
 import {extendContextLoader, SECURITY_CONTEXT_V2_URL} from 'jsonld-signatures';
-import {parseRequest} from 'http-signature-header';
+import {parseRequest, parseSignatureHeader} from 'http-signature-header';
 import {CapabilityInvocation} from 'ocapld';
 import {TextEncoder, base64Decode} from './util.js';
 
@@ -27,7 +27,7 @@ export async function verifyCapabilityInvocation({
   // parse http header for signature
   const expectedHeaders = [
     '(key-id)', '(created)', '(expires)', '(request-target)',
-    'host', 'authorization-capability', 'authorization-capability-action'
+    'host', 'capability-invocation'
   ];
   const reqHeaders = _lowerCaseObjectKeys(headers);
   if(reqHeaders['content-type']) {
@@ -86,7 +86,22 @@ export async function verifyCapabilityInvocation({
   // always dereference the invoked capability to ensure that the system can
   // dereference it authoritatively (which may include ensuring that it is
   // saved in an authorized list, etc.)
-  let capability = reqHeaders['authorization-capability'];
+  const invocationHeader = reqHeaders['capability-invocation'];
+  const parsedInvocationHeader = parseSignatureHeader(invocationHeader);
+  if(parsedInvocationHeader.scheme !== 'zcap') {
+    const error = new Error('Capability invocation scheme must be "zcap".');
+    error.name = 'DataError';
+    error.httpStatusCode = 400;
+    return {verified: false, error: _createNotAllowedError(error)};
+  }
+  let capability = parsedInvocationHeader.params.id;
+  if(!capability) {
+    const error = new Error(
+      'Capability ID not present in Capability-Invocation header.');
+    error.name = 'DataError';
+    error.httpStatusCode = 400;
+    return {verified: false, error: _createNotAllowedError(error)};
+  }
   capability = await getInvokedCapability({id: capability, expectedTarget});
 
   // check capability invocation
@@ -99,7 +114,7 @@ export async function verifyCapabilityInvocation({
     expectedAction,
     suite
   });
-  const capabilityAction = reqHeaders['authorization-capability-action'];
+  const capabilityAction = parsedInvocationHeader.params.action;
   const proof = {
     capability,
     capabilityAction,
