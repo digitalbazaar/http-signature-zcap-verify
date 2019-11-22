@@ -5,20 +5,32 @@
 
 import {LDKeyPair} from 'crypto-ld';
 import {frame} from 'jsonld';
-import {extendContextLoader, SECURITY_CONTEXT_V2_URL} from 'jsonld-signatures';
+import {
+  extendContextLoader,
+  SECURITY_CONTEXT_V2_URL
+} from 'jsonld-signatures';
 import {parseRequest, parseSignatureHeader} from 'http-signature-header';
 import {CapabilityInvocation} from 'ocapld';
 import {TextEncoder, base64Decode} from './util.js';
 
 export async function verifyCapabilityInvocation({
-  url, method, headers, getInvokedCapability, documentLoader,
-  expectedHost, expectedTarget, expectedRootCapability,
-  expectedAction, suite, additionalHeaders = []
+  url,
+  method,
+  headers,
+  getInvokedCapability,
+  documentLoader,
+  expectedHost,
+  expectedTarget,
+  expectedRootCapability,
+  expectedAction,
+  suite,
+  additionalHeaders = []
 }) {
   if(!getInvokedCapability) {
     throw new TypeError(
       '"getInvokedCapability" must be given to dereference the ' +
-      'invoked capability.');
+        'invoked capability.'
+    );
   }
 
   // wrap doc loader to ensure local security contexts are always used
@@ -26,8 +38,12 @@ export async function verifyCapabilityInvocation({
 
   // parse http header for signature
   const expectedHeaders = [
-    '(key-id)', '(created)', '(expires)', '(request-target)',
-    'host', 'capability-invocation'
+    '(key-id)',
+    '(created)',
+    '(expires)',
+    '(request-target)',
+    'host',
+    'capability-invocation'
   ];
   const reqHeaders = _lowerCaseObjectKeys(headers);
   if(reqHeaders['content-type']) {
@@ -37,7 +53,10 @@ export async function verifyCapabilityInvocation({
   expectedHeaders.push(...additionalHeaders);
   let parsed;
   try {
-    parsed = parseRequest({url, method, headers}, {headers: expectedHeaders});
+    parsed = parseRequest(
+      {url, method, headers},
+      {headers: expectedHeaders}
+    );
   } catch(e) {
     return {verified: false, error: _createNotAllowedError(e)};
   }
@@ -63,11 +82,17 @@ export async function verifyCapabilityInvocation({
   capability identifiers are infeasible to guess. */
 
   // get parsed parameters from from HTTP header and generate signing string
-  const {keyId, signingString, params: {signature: b64Signature}} = parsed;
+  const {
+    keyId,
+    signingString,
+    params: {signature: b64Signature}
+  } = parsed;
 
   // fetch verification method from `keyId` and import as a crypto-ld key
-  const verificationMethod = await _getVerificationMethod(
-    {keyId, documentLoader});
+  const verificationMethod = await _getVerificationMethod({
+    keyId,
+    documentLoader
+  });
   const key = await LDKeyPair.from(verificationMethod);
 
   // verify HTTP signature
@@ -97,7 +122,8 @@ export async function verifyCapabilityInvocation({
   let capability = parsedInvocationHeader.params.id;
   if(!capability) {
     const error = new Error(
-      'Capability ID not present in Capability-Invocation header.');
+      'Capability ID not present in Capability-Invocation header.'
+    );
     error.name = 'DataError';
     error.httpStatusCode = 400;
     return {verified: false, error: _createNotAllowedError(error)};
@@ -148,11 +174,19 @@ function _createNotAllowedError(cause) {
 async function _getVerificationMethod({keyId, documentLoader}) {
   // Note: `expansionMap` is intentionally not passed; we can safely drop
   // properties here and must allow for it
-  const {'@graph': [framed]} = await frame(keyId, {
-    '@context': SECURITY_CONTEXT_V2_URL,
-    '@embed': '@always',
-    id: keyId
-  }, {documentLoader, compactToRelative: false});
+  const {
+    '@graph': [framed]
+  } = await frame(
+    keyId,
+    {
+      '@context': SECURITY_CONTEXT_V2_URL,
+      '@embed': '@always',
+      id: keyId,
+      controller: {'@embed': 'never'}
+    },
+    {documentLoader, compactToRelative: false}
+  );
+
   if(!framed) {
     throw new Error(`Verification method ${keyId} not found.`);
   }
