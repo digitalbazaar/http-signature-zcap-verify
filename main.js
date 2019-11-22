@@ -151,7 +151,8 @@ async function _getVerificationMethod({keyId, documentLoader}) {
   const {'@graph': [framed]} = await frame(keyId, {
     '@context': SECURITY_CONTEXT_V2_URL,
     '@embed': '@always',
-    id: keyId
+    id: keyId,
+    controller: {'@embed': 'never'}
   }, {documentLoader, compactToRelative: false});
   if(!framed) {
     throw new Error(`Verification method ${keyId} not found.`);
