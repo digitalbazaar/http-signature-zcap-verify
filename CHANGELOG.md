@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 1.0.1 - 2019-11-25
+
+### Fixed
+- Do not embed `controller` when resolving verification method.
+
 ## 1.0.0 - 2019-08-02
 
 ## 0.1.0 - 2019-08-02
