@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 1.0.2 - 2019-11-25
+
+### Fixed
+- Fix typo with verification method resolver frame.
+
 ## 1.0.1 - 2019-11-25
 
 ### Fixed
