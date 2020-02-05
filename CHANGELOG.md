@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 1.1.0 - 2020-02-05
+
+### Changed
+- Use jsonld@2.0.2.
+
 ## 1.0.3 - 2020-02-05
 
 ### Fixed
