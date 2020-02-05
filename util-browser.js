@@ -11,5 +11,5 @@ export function base64Encode(data) {
 }
 
 export function base64Decode(str) {
-  Uint8Array.from(atob(str), c => c.charCodeAt(0));
+  return Uint8Array.from(atob(str), c => c.charCodeAt(0));
 }
