@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 1.0.3 - 2020-02-05
+
+### Fixed
+- Return value from base64Decode helper.
+
 ## 1.0.2 - 2019-11-25
 
 ### Fixed
