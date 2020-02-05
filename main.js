@@ -3,6 +3,7 @@
  */
 'use strict';
 
+import base64url from 'base64url-universal';
 import {LDKeyPair} from 'crypto-ld';
 import {frame} from 'jsonld';
 import {extendContextLoader, SECURITY_CONTEXT_V2_URL} from 'jsonld-signatures';
@@ -94,15 +95,24 @@ export async function verifyCapabilityInvocation({
     error.httpStatusCode = 400;
     return {verified: false, error: _createNotAllowedError(error)};
   }
+
   let capability = parsedInvocationHeader.params.id;
+  if(capability) {
+    capability = await getInvokedCapability({id: capability, expectedTarget});
+  } else {
+    capability = parsedInvocationHeader.params.capability;
+    if(capability) {
+      capability = JSON.parse(
+        new TextDecoder('utf-8').decode(base64url.decode(capability)));
+    }
+  }
   if(!capability) {
     const error = new Error(
-      'Capability ID not present in Capability-Invocation header.');
+      'Capability not present in Capability-Invocation header.');
     error.name = 'DataError';
     error.httpStatusCode = 400;
     return {verified: false, error: _createNotAllowedError(error)};
   }
-  capability = await getInvokedCapability({id: capability, expectedTarget});
 
   // check capability invocation
   // TODO: add parameters to check any other caveats in the capability as

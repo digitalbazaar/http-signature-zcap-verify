@@ -19,6 +19,7 @@
     "util.js"
   ],
   "dependencies": {
+    "base64url-universal": "^1.0.0",
     "esm": "^3.2.22",
     "crypto-ld": "^3.7.0",
     "jsonld": "^2.0.2",
