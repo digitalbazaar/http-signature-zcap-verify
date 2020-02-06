@@ -14,7 +14,7 @@ import {TextEncoder, base64Decode} from './util.js';
 export async function verifyCapabilityInvocation({
   url, method, headers, getInvokedCapability, documentLoader,
   expectedHost, expectedTarget, expectedRootCapability,
-  expectedAction, suite, additionalHeaders = []
+  expectedAction, inspectCapabilityChain, suite, additionalHeaders = []
 }) {
   if(!getInvokedCapability) {
     throw new TypeError(
@@ -122,6 +122,7 @@ export async function verifyCapabilityInvocation({
     expectedTarget,
     expectedRootCapability,
     expectedAction,
+    inspectCapabilityChain,
     suite
   });
   const capabilityAction = parsedInvocationHeader.params.action;

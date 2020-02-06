@@ -1,5 +1,13 @@
 # http-signature-zcap-verify ChangeLog
 
+## 1.2.0 - TBD
+
+### Added
+- Add support for an `inspectCapabilityChain` handler in
+  `verifyCapabilityInvocation`. This handler can be used to find revocations
+  in the capability chain.
+- Add support for a capability embedded in the header.
+
 ## 1.1.0 - 2020-02-05
 
 ### Changed
