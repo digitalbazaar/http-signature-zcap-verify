@@ -1,10 +1,21 @@
 import {verifyCapabilityInvocation} from '..';
 
-describe('verifyCapabilityInvocation', async function() {
-  it('should', async function() {
+describe('verifyCapabilityInvocation', function() {
+
+  describe('should', function() {
 
   });
-  it('should NOT', async function() {
+
+  describe('should NOT', function() {
+
+    it('verify with out getInvokedCapability', async function() {
+
+    });
+
+    it('verify if expectedHost does not match', async function() {
+
+    });
 
   });
+
 });
