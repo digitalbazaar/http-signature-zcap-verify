@@ -4,6 +4,7 @@
 'use strict';
 
 import base64url from 'base64url-universal';
+import pako from 'pako';
 import {LDKeyPair} from 'crypto-ld';
 import {frame} from 'jsonld';
 import {extendContextLoader, SECURITY_CONTEXT_V2_URL} from 'jsonld-signatures';
@@ -103,7 +104,8 @@ export async function verifyCapabilityInvocation({
     capability = parsedInvocationHeader.params.capability;
     if(capability) {
       capability = JSON.parse(
-        new TextDecoder('utf-8').decode(base64url.decode(capability)));
+        new TextDecoder('utf-8').decode(
+          pako.ungzip(base64url.decode(capability))));
     }
   }
   if(!capability) {
