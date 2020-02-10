@@ -103,9 +103,17 @@ export async function verifyCapabilityInvocation({
   } else {
     capability = parsedInvocationHeader.params.capability;
     if(capability) {
-      capability = JSON.parse(
-        new TextDecoder('utf-8').decode(
-          pako.ungzip(base64url.decode(capability))));
+      try {
+        capability = JSON.parse(
+          new TextDecoder('utf-8').decode(
+            pako.ungzip(base64url.decode(capability))));
+      } catch(e) {
+        const error = new Error(
+          'Capability in Capability-Invocation header is improperly encoded.');
+        error.name = 'DataError';
+        error.httpStatusCode = 400;
+        return {verified: false, error};
+      }
     }
   }
   if(!capability) {
