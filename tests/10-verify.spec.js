@@ -22,9 +22,12 @@ const controller = 'did:test:controller';
 const delegator = 'did:test:delegator';
 const url = 'https://test.org/zcaps/foo';
 const method = 'GET';
-const expectedHost = 'test.org';
 
 const setup = async ({Suite, LDKeyPair}) => {
+  let expectedHost = 'test.org';
+  if(typeof window !== 'undefined') {
+    expectedHost = window.location.host;
+  }
   const keyId = `did:key:${uuid()}`;
   const keyPair = await LDKeyPair.generate({
     id: keyId,
@@ -90,7 +93,9 @@ const setup = async ({Suite, LDKeyPair}) => {
     invocationSigner,
     capabilityAction: 'read'
   });
+  signed.host = signed.host || expectedHost;
   return {
+    expectedHost,
     keyId,
     keyPair,
     suite,
@@ -104,10 +109,16 @@ describe('verifyCapabilityInvocation', function() {
   [Ed25519, Rsa].forEach(function(suiteType) {
 
     describe(suiteType.type, function() {
-      let suite, documentLoader, keyId, getInvokedCapability, signed = null;
+      let suite,
+        documentLoader,
+        keyId,
+        getInvokedCapability,
+        signed,
+        expectedHost = null;
 
       beforeEach(async function() {
         ({
+          expectedHost,
           suite,
           documentLoader,
           keyId,
