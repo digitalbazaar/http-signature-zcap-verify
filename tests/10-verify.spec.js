@@ -158,7 +158,7 @@ describe('verifyCapabilityInvocation', function() {
         result.verified.should.equal(true);
       });
 
-      it('should verify a valid request with mulitple expectedHosts',
+      it('should verify a valid request with multiple expectedHosts',
         async function() {
           const result = await verifyCapabilityInvocation({
             url,
