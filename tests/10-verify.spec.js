@@ -167,9 +167,6 @@ describe('verifyCapabilityInvocation', function() {
           result.verified.should.equal(true);
         });
 
-      it.skip('should verify with additionalHeaders', async function() {
-
-      });
 
       it('should THROW if no getInvokedCapability', async function() {
         let result, error = null;
@@ -516,6 +513,32 @@ describe('verifyCapabilityInvocation', function() {
         result.verified.should.equal(false);
 
       });
+
+      it('should NOT verify with additionalHeaders not used in Signature',
+        async function() {
+          let result, error = null;
+          try {
+            result = await verifyCapabilityInvocation({
+              additionalHeaders: ['foo'],
+              url,
+              method,
+              suite,
+              getInvokedCapability,
+              documentLoader,
+              headers: signed,
+              expectedHost,
+              expectedTarget: url,
+              keyId
+            });
+          } catch(e) {
+            error = e;
+          }
+          should.not.exist(error);
+          should.exist(result);
+          result.should.be.an('object');
+          should.exist(result.verified);
+          result.verified.should.equal(false);
+        });
 
       it('should NOT verify if headers is missing capability-invocation',
         async function() {
