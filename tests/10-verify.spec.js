@@ -143,63 +143,326 @@ describe('verifyCapabilityInvocation', function() {
 
       });
 
-      it.skip('should THROW if no getInvokedCapability', async function() {
-
+      it('should THROW if no getInvokedCapability', async function() {
+        let result, error = null;
+        try {
+          result = await verifyCapabilityInvocation({
+            url,
+            method,
+            suite,
+            headers: signed,
+            expectedHost,
+            documentLoader,
+            expectedTarget: url,
+            keyId
+          });
+        } catch(e) {
+          error = e;
+        }
+        should.not.exist(result);
+        should.exist(error);
       });
 
-      it.skip('should THROW if no documentLoader', async function() {
-
+      it('should THROW if no documentLoader', async function() {
+        let result, error = null;
+        try {
+          result = await verifyCapabilityInvocation({
+            url,
+            method,
+            suite,
+            getInvokedCapability,
+            headers: signed,
+            expectedHost,
+            expectedTarget: url,
+            keyId
+          });
+        } catch(e) {
+          error = e;
+        }
+        should.not.exist(result);
+        should.exist(error);
       });
 
-      it.skip('should THROW if there are no headers', async function() {
-
+      it('should THROW if there are no headers', async function() {
+        let result, error = null;
+        try {
+          result = await verifyCapabilityInvocation({
+            url,
+            method,
+            suite,
+            getInvokedCapability,
+            documentLoader,
+            expectedHost,
+            expectedTarget: url,
+            keyId
+          });
+        } catch(e) {
+          error = e;
+        }
+        should.not.exist(result);
+        should.exist(error);
       });
 
       it.skip('should THROW if verificationMethod type is not supported',
         async function() {
-
+          // TODO use a verificationMethod not supported by LdKeyClass.
+          let result, error = null;
+          try {
+            result = await verifyCapabilityInvocation({
+              url,
+              method,
+              suite,
+              getInvokedCapability,
+              documentLoader,
+              headers: signed,
+              expectedHost,
+              expectedTarget: url,
+              keyId
+            });
+          } catch(e) {
+            error = e;
+          }
+          should.not.exist(result);
+          should.exist(error);
         });
 
-      it.skip('should NOT verify if there is no url', async function() {
-
+      it('should NOT verify if there is no url', async function() {
+        let result, error = null;
+        try {
+          result = await verifyCapabilityInvocation({
+            method,
+            suite,
+            getInvokedCapability,
+            documentLoader,
+            headers: signed,
+            expectedHost,
+            expectedTarget: url,
+            keyId
+          });
+        } catch(e) {
+          error = e;
+        }
+        should.exist(result);
+        should.not.exist(error);
+        result.should.be.an('object');
+        should.exist(result.verified);
+        result.verified.should.equal(false);
       });
 
-
-      it.skip('should NOT verify if host is not in expectedHost', async function() {
-
+      it('should NOT verify if host is not in expectedHost', async function() {
+        let result, error = null;
+        try {
+          result = await verifyCapabilityInvocation({
+            url,
+            method,
+            suite,
+            getInvokedCapability,
+            documentLoader,
+            headers: signed,
+            expectedHost: 'not-foo.org',
+            expectedTarget: url,
+            keyId
+          });
+        } catch(e) {
+          error = e;
+        }
+        should.exist(result);
+        should.not.exist(error);
+        result.should.be.an('object');
+        should.exist(result.verified);
+        result.verified.should.equal(false);
       });
 
       it.skip('should NOT verify if keyId can not be dereferenced by the ' +
         'documentLoader', async function() {
-
+        let result, error = null;
+        try {
+          result = await verifyCapabilityInvocation({
+            url,
+            method,
+            suite,
+            getInvokedCapability,
+            documentLoader,
+            headers: signed,
+            expectedHost,
+            expectedTarget: url,
+            keyId
+          });
+        } catch(e) {
+          error = e;
+        }
+        should.exist(result);
+        should.not.exist(error);
+        result.should.be.an('object');
+        should.exist(result.verified);
+        result.verified.should.equal(false);
       });
 
-      it.skip('should NOT verify if headers is missing (key-id)', async function() {
-
+      it('should NOT verify if Signature is missing keyId', async function() {
+        let result, error = null;
+        // this is just to ensure no keyId is passed in headers
+        delete signed.keyid;
+        const keyIdReplacer = /keyId\=\"[^"]+\"\,/i;
+        // this will remove keyId from the signature
+        // this is where the error should come from
+        signed.authorization = signed.authorization.replace(keyIdReplacer, '');
+        try {
+          result = await verifyCapabilityInvocation({
+            url,
+            method,
+            suite,
+            getInvokedCapability,
+            documentLoader,
+            headers: signed,
+            expectedHost,
+            expectedTarget: url,
+            keyId
+          });
+        } catch(e) {
+          error = e;
+        }
+        should.exist(result);
+        should.not.exist(error);
+        result.should.be.an('object');
+        should.exist(result.verified);
+        result.verified.should.equal(false);
       });
 
-      it.skip('should NOT verify if headers is missing (created)', async function() {
-
-      });
-
-      it.skip('should NOT verify if headers is missing (expires)', async function() {
-
-      });
-
-      it.skip('should NOT verify if headers is missing (request-target)',
+      it('should NOT verify if Signature is missing (created)',
         async function() {
-
+          let result, error = null;
+          const createdReplacer = /created\=\"[^"]+\"\,/i;
+          // this will remove created from the signature
+          // this is where the error should come from
+          signed.authorization = signed.authorization.replace(
+            createdReplacer, '');
+          try {
+            result = await verifyCapabilityInvocation({
+              url,
+              method,
+              suite,
+              getInvokedCapability,
+              documentLoader,
+              headers: signed,
+              expectedHost,
+              expectedTarget: url,
+              keyId
+            });
+          } catch(e) {
+            error = e;
+          }
+          should.exist(result);
+          should.not.exist(error);
+          result.should.be.an('object');
+          should.exist(result.verified);
+          result.verified.should.equal(false);
         });
 
-      it.skip('should NOT verify if headers is missing host', async function() {
+      it('should NOT verify if Signature is missing (expires)',
+        async function() {
+          let result, error = null;
+          const expiresReplacer = /expires\=\"[^"]+\"\,?/i;
+          // this will remove created from the signature
+          // this is where the error should come from
+          signed.authorization = signed.authorization.replace(
+            expiresReplacer, '');
+          try {
+            result = await verifyCapabilityInvocation({
+              url,
+              method,
+              suite,
+              getInvokedCapability,
+              documentLoader,
+              headers: signed,
+              expectedHost,
+              expectedTarget: url,
+              keyId
+            });
+          } catch(e) {
+            error = e;
+          }
+          should.exist(result);
+          should.not.exist(error);
+          result.should.be.an('object');
+          should.exist(result.verified);
+          result.verified.should.equal(false);
+        });
+
+      it('should NOT verify if there is no method',
+        async function() {
+          let result, error = null;
+          try {
+            result = await verifyCapabilityInvocation({
+              url,
+              suite,
+              getInvokedCapability,
+              documentLoader,
+              headers: signed,
+              expectedHost,
+              expectedTarget: url,
+              keyId
+            });
+          } catch(e) {
+            error = e;
+          }
+          should.not.exist(error);
+          should.exist(result);
+          result.should.be.an('object');
+          should.exist(result.verified);
+          result.verified.should.equal(false);
+        });
+
+      it('should NOT verify if headers is missing host', async function() {
+        let result, error = null;
+        delete signed.host;
+        try {
+          result = await verifyCapabilityInvocation({
+            url,
+            method,
+            suite,
+            getInvokedCapability,
+            documentLoader,
+            headers: signed,
+            expectedHost,
+            expectedTarget: url,
+            keyId
+          });
+        } catch(e) {
+          error = e;
+        }
+        should.not.exist(error);
+        should.exist(result);
+        result.should.be.an('object');
+        should.exist(result.verified);
+        result.verified.should.equal(false);
 
       });
 
-      it.skip('should NOT verify if headers is missing capability-invocation',
+      it('should NOT verify if headers is missing capability-invocation',
         async function() {
-
+          let result, error = null;
+          delete signed['capability-invocation'];
+          try {
+            result = await verifyCapabilityInvocation({
+              url,
+              method,
+              suite,
+              getInvokedCapability,
+              documentLoader,
+              headers: signed,
+              expectedHost,
+              expectedTarget: url,
+              keyId
+            });
+          } catch(e) {
+            error = e;
+          }
+          should.not.exist(error);
+          should.exist(result);
+          result.should.be.an('object');
+          should.exist(result.verified);
+          result.verified.should.equal(false);
         });
-
     });
   });
 });
