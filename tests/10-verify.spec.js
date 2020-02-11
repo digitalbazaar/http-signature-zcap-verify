@@ -56,7 +56,7 @@ const setup = async ({Suite, LDKeyPair}) => {
         document: doc
       };
     }
-    if(uri === keyId || uri === controller) {
+    if(uri === keyId) {
       const doc = keyPair.publicNode();
       doc['@context'] = SECURITY_CONTEXT_V2_URL;
       doc.controller = controller;
@@ -203,17 +203,32 @@ describe('verifyCapabilityInvocation', function() {
         should.exist(error);
       });
 
-      it.skip('should THROW if verificationMethod type is not supported',
+      it('should THROW if verificationMethod type is not supported',
         async function() {
-          // TODO use a verificationMethod not supported by LdKeyClass.
           let result, error = null;
+          const _documentLoader = async uri => {
+            if(uri === keyId) {
+              const doc = {
+                id: uri,
+                '@context': SECURITY_CONTEXT_V2_URL,
+                controller,
+                type: 'AESVerificationKey2001'
+              };
+              return {
+                contextUrl: null,
+                documentUrl: uri,
+                document: doc
+              };
+            }
+            return documentLoader(uri);
+          };
           try {
             result = await verifyCapabilityInvocation({
               url,
               method,
               suite,
               getInvokedCapability,
-              documentLoader,
+              documentLoader: _documentLoader,
               headers: signed,
               expectedHost,
               expectedTarget: url,
@@ -224,6 +239,7 @@ describe('verifyCapabilityInvocation', function() {
           }
           should.not.exist(result);
           should.exist(error);
+          error.message.should.contain('Unsupported Key Type');
         });
 
       it('should NOT verify if there is no url', async function() {
@@ -273,16 +289,26 @@ describe('verifyCapabilityInvocation', function() {
         result.verified.should.equal(false);
       });
 
-      it.skip('should NOT verify if keyId can not be dereferenced by the ' +
+      it('should THROW if keyId can not be dereferenced by the ' +
         'documentLoader', async function() {
         let result, error = null;
+        const _documentLoader = async uri => {
+          if(uri === keyId) {
+            return {
+              contextUrl: null,
+              documentUrl: uri,
+              document: null
+            };
+          }
+          return documentLoader(uri);
+        };
         try {
           result = await verifyCapabilityInvocation({
             url,
             method,
             suite,
             getInvokedCapability,
-            documentLoader,
+            documentLoader: _documentLoader,
             headers: signed,
             expectedHost,
             expectedTarget: url,
@@ -291,11 +317,10 @@ describe('verifyCapabilityInvocation', function() {
         } catch(e) {
           error = e;
         }
-        should.exist(result);
-        should.not.exist(error);
-        result.should.be.an('object');
-        should.exist(result.verified);
-        result.verified.should.equal(false);
+        should.exist(error);
+        should.not.exist(result);
+        error.message.should.equal('Could not retrieve a JSON-LD ' +
+          'document from the URL.');
       });
 
       it('should NOT verify if Signature is missing keyId', async function() {
