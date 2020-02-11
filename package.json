@@ -40,6 +40,7 @@
     "cross-env": "^5.2.0",
     "eslint": "^5.16.0",
     "eslint-config-digitalbazaar": "^2.0.0",
+    "http-signature-zcap-invoke": "^1.1.1",
     "karma": "^4.0.1",
     "karma-babel-preprocessor": "^8.0.0",
     "karma-chai": "^0.1.0",

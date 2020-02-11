@@ -1,4 +1,5 @@
 import {verifyCapabilityInvocation} from '..';
+import {signCapabilityInvocation} from 'http-signature-zcap-invoke';
 import {suites, SECURITY_CONTEXT_V2_URL} from 'jsonld-signatures';
 import {Ed25519KeyPair, RSAKeyPair} from 'crypto-ld';
 import uuid from 'uuid-random';
@@ -19,9 +20,9 @@ const Rsa = {
 
 const controller = 'did:test:controller';
 const delegator = 'did:test:delegator';
-const invoker = 'did:test:invoker';
 const url = 'https://test.org/zcaps/foo';
-const expectedHost = 'test';
+const method = 'GET';
+const expectedHost = 'test.org';
 
 const setup = async ({Suite, LDKeyPair}) => {
   const keyId = `did:key:${uuid()}`;
@@ -33,62 +34,105 @@ const setup = async ({Suite, LDKeyPair}) => {
     verificationMethod: keyId,
     key: keyPair
   });
-  const documentLoader = async url => {
-    if(url === keyId) {
-      return keyPair.publicNode();
+  const rootCapability = {
+    '@context': SECURITY_CONTEXT_V2_URL,
+    id: url,
+    invocationTarget: url,
+    controller,
+    delegator,
+    invoker: keyId
+  };
+
+  const documentLoader = async uri => {
+    if(uri === controller) {
+      const doc = {
+        id: controller,
+        '@context': SECURITY_CONTEXT_V2_URL,
+        capabilityInvocation: [keyId]
+      };
+      return {
+        contextUrl: null,
+        documentUrl: uri,
+        document: doc
+      };
     }
-    throw new Error(`documentLoader unable to resolve ${url}`);
+    if(uri === keyId || uri === controller) {
+      const doc = keyPair.publicNode();
+      doc['@context'] = SECURITY_CONTEXT_V2_URL;
+      doc.controller = controller;
+      return {
+        contextUrl: null,
+        documentUrl: uri,
+        document: doc
+      };
+    }
+    if(uri === url) {
+      return {
+        contextUrl: null,
+        documentUrl: uri,
+        document: rootCapability
+      };
+    }
+    throw new Error(`documentLoader unable to resolve ${uri}`);
   };
-  const getInvokedCapability = ({id, expectedTarget}) => {
-    return {
-      '@context': SECURITY_CONTEXT_V2_URL,
-      id: url,
-      invocationTarget: url,
-      controller,
-      delegator,
-      invoker
-    };
-  };
+  const getInvokedCapability = () => rootCapability;
   const created = Date.now() - 1000;
-  const expires = Date.now() + 10000;
-  const headers = {
+  const invocationSigner = keyPair.signer();
+  invocationSigner.id = keyId;
+  const signed = await signCapabilityInvocation({
     url,
-    host: expectedHost,
-    date: created,
-    'capability-invocation': url,
-    authorization: `Signature keyId="${keyId}",created="${created}",` +
-      `expires="${expires}",requestTarget="${url}",signature="foo"`
+    method,
+    headers: {
+      keyId,
+      date: created
+    },
+    json: {foo: true},
+    invocationSigner,
+    capabilityAction: 'read'
+  });
+  return {
+    keyId,
+    keyPair,
+    suite,
+    signed,
+    documentLoader,
+    getInvokedCapability,
   };
-  return {keyId, keyPair, suite, documentLoader, getInvokedCapability, headers};
 };
 
 describe('verifyCapabilityInvocation', function() {
   [Ed25519, Rsa].forEach(function(suiteType) {
 
     describe(suiteType.type, function() {
-      let suite, documentLoader, keyId, getInvokedCapability, headers = null;
+      let suite, documentLoader, keyId, getInvokedCapability, signed = null;
 
       beforeEach(async function() {
         ({
           suite,
           documentLoader,
           keyId,
-          headers,
-          getInvokedCapability
+          getInvokedCapability,
+          signed
         } = await setup(suiteType));
       });
 
       it('should verify a valid request', async function() {
-        console.log('headers', headers);
         const result = await verifyCapabilityInvocation({
           url,
+          method,
           suite,
-          headers,
+          headers: signed,
+          expectedHost,
           getInvokedCapability,
           documentLoader,
+          expectedTarget: url,
           keyId
         });
-        console.log('result', result);
+        should.exist(result);
+        result.should.be.an('object');
+        should.exist(result.verified);
+        result.verified.should.be.an('boolean');
+        result.verified.should.equal(true);
       });
 
       it.skip('should add headers if content-type is in headers', async function() {
