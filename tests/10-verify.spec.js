@@ -28,6 +28,7 @@ const setup = async ({Suite, LDKeyPair}) => {
   if(typeof window !== 'undefined') {
     expectedHost = window.location.host; // eslint-disable-line no-undef
   }
+  // the tests will use a mock didKey.
   const keyId = `did:key:${uuid()}`;
   const keyPair = await LDKeyPair.generate({
     id: keyId,
@@ -37,6 +38,7 @@ const setup = async ({Suite, LDKeyPair}) => {
     verificationMethod: keyId,
     key: keyPair
   });
+  // this is a zCap
   const rootCapability = {
     '@context': SECURITY_CONTEXT_V2_URL,
     id: url,
@@ -47,6 +49,9 @@ const setup = async ({Suite, LDKeyPair}) => {
   };
 
   const documentLoader = async uri => {
+    // the controller should return a didDocument
+    // with the ProofPurpose's term on it
+    // In this case that term is capabilityInvocation
     if(uri === controller) {
       const doc = {
         id: controller,
@@ -59,6 +64,8 @@ const setup = async ({Suite, LDKeyPair}) => {
         document: doc
       };
     }
+    // when we dereference the keyId for verification
+    // all we need is the publicNode
     if(uri === keyId) {
       const doc = keyPair.publicNode();
       doc['@context'] = SECURITY_CONTEXT_V2_URL;
@@ -80,6 +87,7 @@ const setup = async ({Suite, LDKeyPair}) => {
   };
   const getInvokedCapability = () => rootCapability;
   const created = Date.now() - 1000;
+  // we need a signer just for the sign step
   const invocationSigner = keyPair.signer();
   invocationSigner.id = keyId;
   const signed = await signCapabilityInvocation({
@@ -166,7 +174,6 @@ describe('verifyCapabilityInvocation', function() {
           result.verified.should.be.an('boolean');
           result.verified.should.equal(true);
         });
-
 
       it('should THROW if no getInvokedCapability', async function() {
         let result, error = null;
