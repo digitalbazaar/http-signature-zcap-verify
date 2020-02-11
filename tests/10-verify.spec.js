@@ -1,3 +1,6 @@
+/*!
+ * Copyright (c) 2020 Digital Bazaar, Inc. All rights reserved.
+ */
 import {verifyCapabilityInvocation} from '..';
 import {signCapabilityInvocation} from 'http-signature-zcap-invoke';
 import {suites, SECURITY_CONTEXT_V2_URL} from 'jsonld-signatures';
@@ -411,7 +414,7 @@ describe('verifyCapabilityInvocation', function() {
         result.verified.should.equal(false);
       });
 
-      it('should NOT verify if Signature is missing (created)',
+      it('should NOT verify if Signature is missing created',
         async function() {
           let result, error = null;
           const createdReplacer = /created\=\"[^"]+\"\,/i;
@@ -441,7 +444,7 @@ describe('verifyCapabilityInvocation', function() {
           result.verified.should.equal(false);
         });
 
-      it('should NOT verify if Signature is missing (expires)',
+      it('should NOT verify if Signature is missing expires',
         async function() {
           let result, error = null;
           const expiresReplacer = /expires\=\"[^"]+\"\,?/i;
