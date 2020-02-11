@@ -178,6 +178,43 @@ describe('verifyCapabilityInvocation', function() {
           result.verified.should.equal(true);
         });
 
+      it('should THROW if verificationMethod has been revoked',
+        async function() {
+          let result, error = null;
+          const _documentLoader = async uri => {
+            if(keyId === uri) {
+              const doc = {id: keyId};
+              doc['@context'] = SECURITY_CONTEXT_V2_URL;
+              doc.controller = controller;
+              doc.revoked = 'foo';
+              return {
+                contextUrl: null,
+                documentUrl: uri,
+                document: doc
+              };
+            }
+            return documentLoader(uri);
+          };
+          try {
+            result = await verifyCapabilityInvocation({
+              url,
+              method,
+              suite,
+              getInvokedCapability,
+              documentLoader: _documentLoader,
+              headers: signed,
+              expectedHost,
+              expectedTarget: url,
+              keyId
+            });
+          } catch(e) {
+            error = e;
+          }
+          should.not.exist(result);
+          should.exist(error);
+          error.message.should.contain('verification method has been revoked');
+        });
+
       it('should THROW if no getInvokedCapability', async function() {
         let result, error = null;
         try {
