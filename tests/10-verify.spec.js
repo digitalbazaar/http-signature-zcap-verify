@@ -215,6 +215,41 @@ describe('verifyCapabilityInvocation', function() {
           error.message.should.contain('verification method has been revoked');
         });
 
+      it('should THROW if verificationMethod can not be framed',
+        async function() {
+          let result, error = null;
+          const _documentLoader = async uri => {
+            if(keyId === uri) {
+              const doc = {id: keyId};
+              return {
+                contextUrl: null,
+                documentUrl: uri,
+                document: doc
+              };
+            }
+            return documentLoader(uri);
+          };
+          try {
+            result = await verifyCapabilityInvocation({
+              url,
+              method,
+              suite,
+              getInvokedCapability,
+              documentLoader: _documentLoader,
+              headers: signed,
+              expectedHost,
+              expectedTarget: url,
+              keyId
+            });
+          } catch(e) {
+            error = e;
+          }
+          should.not.exist(result);
+          should.exist(error);
+          error.message.should.contain(
+            `Verification method ${keyId} not found.`);
+        });
+
       it('should THROW if no getInvokedCapability', async function() {
         let result, error = null;
         try {
