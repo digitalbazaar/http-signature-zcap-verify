@@ -10,7 +10,7 @@ import {frame} from 'jsonld';
 import {extendContextLoader, SECURITY_CONTEXT_V2_URL} from 'jsonld-signatures';
 import {parseRequest, parseSignatureHeader} from 'http-signature-header';
 import {CapabilityInvocation} from 'ocapld';
-import {TextEncoder, base64Decode} from './util.js';
+import {TextDecoder, TextEncoder, base64Decode} from './util.js';
 
 export async function verifyCapabilityInvocation({
   url, method, headers, getInvokedCapability, documentLoader,
