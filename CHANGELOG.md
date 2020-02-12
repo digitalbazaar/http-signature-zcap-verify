@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 1.2.1 - 2020-02-11
+
+### Fixed
+- Add missing import for `TextDecoder`.
+
 ## 1.2.0 - 2020-02-10
 
 ### Added
