@@ -41,6 +41,7 @@ const setup = async ({Suite, LDKeyPair}) => {
     verificationMethod: keyId,
     key: keyPair
   });
+
   // this is a zCap
   const rootCapability = {
     '@context': SECURITY_CONTEXT_V2_URL,
@@ -268,6 +269,7 @@ describe('verifyCapabilityInvocation', function() {
         }
         should.not.exist(result);
         should.exist(error);
+        error.message.should.contain('getInvokedCapability');
       });
 
       it('should THROW if no documentLoader', async function() {
@@ -288,6 +290,7 @@ describe('verifyCapabilityInvocation', function() {
         }
         should.not.exist(result);
         should.exist(error);
+        error.message.should.contain('documentLoader');
       });
 
       it('should THROW if there are no headers', async function() {
@@ -308,6 +311,8 @@ describe('verifyCapabilityInvocation', function() {
         }
         should.not.exist(result);
         should.exist(error);
+        error.name.should.equal('TypeError');
+        error.message.should.contain('undefined');
       });
 
       it('should THROW if keyId can not be dereferenced by the ' +
@@ -407,6 +412,9 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
+          result.error.name.should.equal('NotAllowedError');
+          result.error.cause.message.should.contain(
+            'digest was not in the request');
         });
 
       it('should NOT verify if there is no url', async function() {
@@ -430,6 +438,8 @@ describe('verifyCapabilityInvocation', function() {
         result.should.be.an('object');
         should.exist(result.verified);
         result.verified.should.equal(false);
+        result.error.name.should.equal('NotAllowedError');
+        result.error.cause.message.should.contain('startsWith');
       });
 
       it('should NOT verify if host is not in expectedHost', async function() {
@@ -454,6 +464,9 @@ describe('verifyCapabilityInvocation', function() {
         result.should.be.an('object');
         should.exist(result.verified);
         result.verified.should.equal(false);
+        result.error.name.should.equal('NotAllowedError');
+        result.error.message.should.equal(
+          'Host header contains an unexpected host name.');
       });
 
       it('should NOT verify if Signature is missing keyId', async function() {
@@ -484,6 +497,8 @@ describe('verifyCapabilityInvocation', function() {
         result.should.be.an('object');
         should.exist(result.verified);
         result.verified.should.equal(false);
+        result.error.name.should.equal('NotAllowedError');
+        result.error.cause.message.should.equal('keyId was not specified');
       });
 
       it('should NOT verify if Signature is missing created',
@@ -514,6 +529,9 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
+          result.error.name.should.equal('NotAllowedError');
+          result.error.cause.message.should.equal(
+            'created was not in the request');
         });
 
       it('should NOT verify if Signature is missing expires',
@@ -544,6 +562,9 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
+          result.error.name.should.equal('NotAllowedError');
+          result.error.cause.message.should.equal(
+            'expires was not in the request');
         });
 
       it('should NOT verify if there is no method',
@@ -568,6 +589,8 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
+          result.error.name.should.equal('NotAllowedError');
+          result.error.cause.message.should.contain('toLowerCase');
         });
 
       it('should NOT verify if headers is missing host', async function() {
@@ -593,7 +616,9 @@ describe('verifyCapabilityInvocation', function() {
         result.should.be.an('object');
         should.exist(result.verified);
         result.verified.should.equal(false);
-
+        result.error.name.should.equal('NotAllowedError');
+        result.error.message.should.equal(
+          'Host header contains an unexpected host name.');
       });
 
       it('should NOT verify with additionalHeaders not used in Signature',
@@ -620,6 +645,9 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
+          result.error.name.should.equal('NotAllowedError');
+          result.error.cause.message.should.equal(
+            'foo was not a signed header');
         });
 
       it('should NOT verify if headers is missing capability-invocation',
@@ -646,6 +674,9 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
+          result.error.name.should.equal('NotAllowedError');
+          result.error.cause.message.should.equal(
+            'capability-invocation was not in the request');
         });
     });
   });
