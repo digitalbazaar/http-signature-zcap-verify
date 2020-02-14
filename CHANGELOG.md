@@ -1,5 +1,11 @@
 # http-signature-zcap-verify ChangeLog
 
+## 1.3.0 - 2020-02-14
+
+### Changed
+- Use jsonld-signatures@5.
+- Improve test coverage.
+
 ## 1.2.1 - 2020-02-11
 
 ### Fixed
