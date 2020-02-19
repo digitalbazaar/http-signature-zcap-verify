@@ -40,8 +40,8 @@ export async function verifyCapabilityInvocation({
   let parsed;
   try {
     parsed = parseRequest({url, method, headers}, {headers: expectedHeaders});
-  } catch(e) {
-    return {verified: false, error: _createNotAllowedError(e)};
+  } catch(error) {
+    return {verified: false, error};
   }
 
   // verify that `host` matches server host
@@ -52,7 +52,6 @@ export async function verifyCapabilityInvocation({
   if(!expectedHost.includes(host)) {
     const error = new Error('Host header contains an unexpected host name.');
     error.name = 'NotAllowedError';
-    error.httpStatusCode = 400;
     error.host = host;
     error.expectedHost = expectedHost;
     return {verified: false, error};
@@ -81,8 +80,7 @@ export async function verifyCapabilityInvocation({
   if(!verified) {
     const error = new Error('Signature not verified.');
     error.name = 'DataError';
-    error.httpStatusCode = 400;
-    return {verified: false, error: _createNotAllowedError(error)};
+    return {verified: false, error};
   }
 
   // always dereference the invoked capability to ensure that the system can
@@ -93,8 +91,7 @@ export async function verifyCapabilityInvocation({
   if(parsedInvocationHeader.scheme !== 'zcap') {
     const error = new Error('Capability invocation scheme must be "zcap".');
     error.name = 'DataError';
-    error.httpStatusCode = 400;
-    return {verified: false, error: _createNotAllowedError(error)};
+    return {verified: false, error};
   }
 
   let capability = parsedInvocationHeader.params.id;
@@ -111,7 +108,6 @@ export async function verifyCapabilityInvocation({
         const error = new Error(
           'Capability in Capability-Invocation header is improperly encoded.');
         error.name = 'DataError';
-        error.httpStatusCode = 400;
         return {verified: false, error};
       }
     }
@@ -120,8 +116,7 @@ export async function verifyCapabilityInvocation({
     const error = new Error(
       'Capability not present in Capability-Invocation header.');
     error.name = 'DataError';
-    error.httpStatusCode = 400;
-    return {verified: false, error: _createNotAllowedError(error)};
+    return {verified: false, error};
   }
 
   // check capability invocation
@@ -146,7 +141,7 @@ export async function verifyCapabilityInvocation({
     documentLoader
   });
   if(!valid) {
-    return {verified: false, error: _createNotAllowedError(error)};
+    return {verified: false, error};
   }
 
   return {
@@ -156,14 +151,6 @@ export async function verifyCapabilityInvocation({
     capabilityAction,
     verificationMethod
   };
-}
-
-function _createNotAllowedError(cause) {
-  const error = new Error('Permission denied.');
-  error.name = 'NotAllowedError';
-  error.httpStatusCode = 400;
-  error.cause = cause;
-  return error;
 }
 
 async function _getVerificationMethod({keyId, documentLoader}) {

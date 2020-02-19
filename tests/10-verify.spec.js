@@ -412,9 +412,8 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
-          result.error.name.should.equal('NotAllowedError');
-          result.error.cause.message.should.contain(
-            'digest was not in the request');
+          result.error.name.should.equal('SyntaxError');
+          result.error.message.should.contain('digest was not in the request');
         });
 
       it('should NOT verify if there is no url', async function() {
@@ -438,8 +437,8 @@ describe('verifyCapabilityInvocation', function() {
         result.should.be.an('object');
         should.exist(result.verified);
         result.verified.should.equal(false);
-        result.error.name.should.equal('NotAllowedError');
-        result.error.cause.message.should.contain('startsWith');
+        result.error.name.should.equal('TypeError');
+        result.error.message.should.contain('startsWith');
       });
 
       it('should NOT verify if host is not in expectedHost', async function() {
@@ -497,8 +496,8 @@ describe('verifyCapabilityInvocation', function() {
         result.should.be.an('object');
         should.exist(result.verified);
         result.verified.should.equal(false);
-        result.error.name.should.equal('NotAllowedError');
-        result.error.cause.message.should.equal('keyId was not specified');
+        result.error.name.should.equal('SyntaxError');
+        result.error.message.should.equal('keyId was not specified');
       });
 
       it('should NOT verify if Signature is missing created',
@@ -529,9 +528,8 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
-          result.error.name.should.equal('NotAllowedError');
-          result.error.cause.message.should.equal(
-            'created was not in the request');
+          result.error.name.should.equal('SyntaxError');
+          result.error.message.should.equal('created was not in the request');
         });
 
       it('should NOT verify if Signature is missing expires',
@@ -562,9 +560,8 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
-          result.error.name.should.equal('NotAllowedError');
-          result.error.cause.message.should.equal(
-            'expires was not in the request');
+          result.error.name.should.equal('SyntaxError');
+          result.error.message.should.equal('expires was not in the request');
         });
 
       it('should NOT verify if there is no method',
@@ -589,8 +586,8 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
-          result.error.name.should.equal('NotAllowedError');
-          result.error.cause.message.should.contain('toLowerCase');
+          result.error.name.should.equal('TypeError');
+          result.error.message.should.contain('toLowerCase');
         });
 
       it('should NOT verify if headers is missing host', async function() {
@@ -645,9 +642,8 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
-          result.error.name.should.equal('NotAllowedError');
-          result.error.cause.message.should.equal(
-            'foo was not a signed header');
+          result.error.name.should.equal('SyntaxError');
+          result.error.message.should.equal('foo was not a signed header');
         });
 
       it('should NOT verify if headers is missing capability-invocation',
@@ -674,8 +670,8 @@ describe('verifyCapabilityInvocation', function() {
           result.should.be.an('object');
           should.exist(result.verified);
           result.verified.should.equal(false);
-          result.error.name.should.equal('NotAllowedError');
-          result.error.cause.message.should.equal(
+          result.error.name.should.equal('SyntaxError');
+          result.error.message.should.equal(
             'capability-invocation was not in the request');
         });
     });
