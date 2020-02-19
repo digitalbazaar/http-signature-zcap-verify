@@ -1,6 +1,6 @@
 # http-signature-zcap-verify ChangeLog
 
-## 2.0.0 - TBD
+## 2.0.0 - 2020-02-19
 
 ### Changed
 - **BREAKING**: Do not wrap errors in a 'NotAllowedError'.
