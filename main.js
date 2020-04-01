@@ -16,7 +16,7 @@ export async function verifyCapabilityInvocation({
   url, method, headers, getInvokedCapability, documentLoader,
   expectedHost, expectedTarget, expectedRootCapability,
   expectedAction, inspectCapabilityChain, suite, additionalHeaders = [],
-  allowHierarchicalDelegation = false
+  allowTargetAttenuation = false
 }) {
   if(!getInvokedCapability) {
     throw new TypeError(
@@ -125,7 +125,7 @@ export async function verifyCapabilityInvocation({
   // appropriate... noting that caveats like "file size" can't be checked
   // until the file received hits the limit, so that won't happen here
   const purpose = new CapabilityInvocation({
-    allowHierarchicalDelegation,
+    allowTargetAttenuation,
     expectedTarget,
     expectedRootCapability,
     expectedAction,
