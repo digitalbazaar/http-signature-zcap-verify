@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 3.0.0 - 2020-04-02
+
+### Changed
+- **BREAKING**: Use ocapld@2.
+
 ## 2.0.0 - 2020-02-19
 
 ### Changed
