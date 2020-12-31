@@ -12,11 +12,40 @@ import {parseRequest, parseSignatureHeader} from 'http-signature-header';
 import {CapabilityInvocation} from 'ocapld';
 import {TextDecoder, TextEncoder, base64Decode} from './util.js';
 
+/**
+ * Verifies a zcap in the form of an http-signature header.
+ *
+ * @param {object} options - Options to use.
+ * @param {URL} options.url - The url of the request.
+ * @param {string} options.method - The HTTP request method.
+ * @param {Array<string>} options.headers - The headers used to make the
+ *   signature.
+ * @param {Function<Promise>} options.getInvokedCapability - An async
+ *   function that can dereference the capability.
+ * @param {Function} options.documentLoader - A jsonld documentloader.
+ * @param {string} options.expectedHost - The expected host of the request.
+ * @param {string} options.expectedTarget - The expected target of the zcap.
+ * @param {string} options.expectedRootCapability - The expected root capability
+ *   of the zcap.
+ * @param {string} options.expectedAction - The expected allowed action of the
+ *  zcap.
+ * @param {Function} options.inspectCapabilityChain - A function that can
+ *   validate a capability chain.
+ * @param {object} options.suite - A jsigs signature suite.
+ * @param {Array<string>} [options.additionalHeaders=[]] - Additional headers
+ *  to verify.
+ * @param {boolean} [allowTargetAttenuation=false] - Allow the
+ *   invocationTarget of a delegation chain to be increasingly restrictive
+ *   based on a hierarchical RESTful URL structure.
+ * @param {integer} [options.now=now] - A unix time stamp.
+ *
+ * @returns {Promise<object>} The result of the verification.
+*/
 export async function verifyCapabilityInvocation({
   url, method, headers, getInvokedCapability, documentLoader,
   expectedHost, expectedTarget, expectedRootCapability,
   expectedAction, inspectCapabilityChain, suite, additionalHeaders = [],
-  allowTargetAttenuation = false
+  allowTargetAttenuation = false, now = Math.floor(Date.now() / 1000)
 }) {
   if(!getInvokedCapability) {
     throw new TypeError(
@@ -40,7 +69,8 @@ export async function verifyCapabilityInvocation({
   expectedHeaders.push(...additionalHeaders);
   let parsed;
   try {
-    parsed = parseRequest({url, method, headers}, {headers: expectedHeaders});
+    parsed = parseRequest(
+      {url, method, headers}, {headers: expectedHeaders, now});
   } catch(error) {
     return {verified: false, error};
   }
