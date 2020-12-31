@@ -34,7 +34,7 @@ import {TextDecoder, TextEncoder, base64Decode} from './util.js';
  * @param {object} options.suite - A jsigs signature suite.
  * @param {Array<string>} [options.additionalHeaders=[]] - Additional headers
  *  to verify.
- * @param {boolean} [allowTargetAttenuation=false] - Allow the
+ * @param {boolean} [options.allowTargetAttenuation=false] - Allow the
  *   invocationTarget of a delegation chain to be increasingly restrictive
  *   based on a hierarchical RESTful URL structure.
  * @param {integer} [options.now=now] - A unix time stamp.
