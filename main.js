@@ -16,7 +16,7 @@ import {TextDecoder, TextEncoder, base64Decode} from './util.js';
  * Verifies a zcap in the form of an http-signature header.
  *
  * @param {object} options - Options to use.
- * @param {URL} options.url - The url of the request.
+ * @param {string} options.url - The url of the request.
  * @param {string} options.method - The HTTP request method.
  * @param {Array<string>} options.headers - The headers from the request.
  * @param {Function<Promise>} options.getInvokedCapability - An async
