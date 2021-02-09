@@ -21,7 +21,8 @@ import {TextDecoder, TextEncoder, base64Decode} from './util.js';
  * @param {Array<string>} options.headers - The headers used to make the
  *   signature.
  * @param {Function<Promise>} options.getInvokedCapability - An async
- *   function that can dereference the capability.
+ *   function to call to dereference the invoked capability if it was passed
+ *   by reference.
  * @param {Function} options.documentLoader - A jsonld documentloader.
  * @param {string} options.expectedHost - The expected host of the request.
  * @param {string} options.expectedTarget - The expected target of the zcap.
