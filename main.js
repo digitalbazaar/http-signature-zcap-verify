@@ -13,7 +13,7 @@ import {CapabilityInvocation} from 'ocapld';
 import {TextDecoder, TextEncoder, base64Decode} from './util.js';
 
 /**
- * Verifies a zcap in the form of an http-signature header.
+ * Verifies a zcap invocation in the form of an http-signature header.
  *
  * @param {object} options - Options to use.
  * @param {string} options.url - The url of the request.
