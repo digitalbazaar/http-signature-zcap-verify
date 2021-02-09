@@ -30,7 +30,7 @@ import {TextDecoder, TextEncoder, base64Decode} from './util.js';
  * @param {string} options.expectedAction - The expected allowed action of the
  *  zcap.
  * @param {Function} options.inspectCapabilityChain - A function that can
- *   validate a capability chain.
+ *   inspect a capability chain.
  * @param {object} options.suite - A jsigs signature suite.
  * @param {Array<string>} [options.additionalHeaders=[]] - Additional headers
  *  to verify.
