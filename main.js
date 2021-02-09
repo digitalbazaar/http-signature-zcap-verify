@@ -18,8 +18,7 @@ import {TextDecoder, TextEncoder, base64Decode} from './util.js';
  * @param {object} options - Options to use.
  * @param {URL} options.url - The url of the request.
  * @param {string} options.method - The HTTP request method.
- * @param {Array<string>} options.headers - The headers used to make the
- *   signature.
+ * @param {Array<string>} options.headers - The headers from the request.
  * @param {Function<Promise>} options.getInvokedCapability - An async
  *   function to call to dereference the invoked capability if it was passed
  *   by reference.
