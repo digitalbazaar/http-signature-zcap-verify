@@ -1,5 +1,14 @@
 # http-signature-zcap-verify ChangeLog
 
+## 4.0.0 - TBD
+
+### Changed
+- **BREAKING**: Use `http-signature-header ^2.0.0`.
+- **BREAKING**: Use Unix time stamps instead of ms.
+
+### Added
+- Parameter `now` to `verifyCapabilityInvocation`. 
+
 ## 3.0.0 - 2020-04-02
 
 ### Changed
