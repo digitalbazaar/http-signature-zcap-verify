@@ -49,10 +49,13 @@ module.exports = function(config) {
         ]
       },
       node: {
-        Buffer: false,
-        process: false,
-        crypto: false,
-        setImmediate: false
+        global: true,
+      },
+      resolve: {
+        fallback: {
+          url: false,
+          util: false,
+        }
       },
       externals: {
         'bitcore-message': '\'bitcore-message\''
