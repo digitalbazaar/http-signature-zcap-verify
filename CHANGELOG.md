@@ -1,6 +1,6 @@
 # http-signature-zcap-verify ChangeLog
 
-## 4.0.0 - TBD
+## 4.0.0 - 2021-03-02
 
 ### Changed
 - **BREAKING**: Use `http-signature-header@2`.
