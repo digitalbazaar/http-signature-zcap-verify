@@ -3,11 +3,12 @@
 ## 4.0.0 - TBD
 
 ### Changed
-- **BREAKING**: Use `http-signature-header ^2.0.0`.
-- **BREAKING**: Use Unix time stamps instead of ms.
+- **BREAKING**: Use `http-signature-header@2`.
+- **BREAKING**: Use Unix time stamps (seconds since epoch) instead of ms since
+  epoch.
 
 ### Added
-- Parameter `now` to `verifyCapabilityInvocation`. 
+- Parameter `now` to `verifyCapabilityInvocation` API.
 
 ## 3.0.0 - 2020-04-02
 
