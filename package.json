@@ -23,7 +23,7 @@
     "base64url-universal": "^1.0.0",
     "crypto-ld": "^3.7.0",
     "esm": "^3.2.22",
-    "http-signature-header": "github:digitalbazaar/http-signature-header",
+    "http-signature-header": "^2.0.1",
     "jsonld": "^2.0.2",
     "jsonld-signatures": "^5.0.0",
     "ocapld": "^2.0.0",
