@@ -1,5 +1,11 @@
 # http-signature-zcap-verify ChangeLog
 
+## 5.0.0 - TBD
+
+### Changed
+- **BREAKING**: Only support `Ed25519Signature2020` proofs.
+- Use `crytold@5`.
+
 ## 4.0.0 - 2021-03-02
 
 ### Changed
