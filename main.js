@@ -5,12 +5,16 @@
 
 import base64url from 'base64url-universal';
 import pako from 'pako';
-import {LDKeyPair} from 'crypto-ld';
-import {frame} from 'jsonld';
-import {extendContextLoader, SECURITY_CONTEXT_V2_URL} from 'jsonld-signatures';
+import {CryptoLD} from 'crypto-ld';
+import {extendContextLoader} from 'jsonld-signatures';
 import {parseRequest, parseSignatureHeader} from 'http-signature-header';
 import {CapabilityInvocation} from 'ocapld';
 import {TextDecoder, TextEncoder, base64Decode} from './util.js';
+import {Ed25519VerificationKey2020} from
+  '@digitalbazaar/ed25519-verification-key-2020';
+
+const cryptoLd = new CryptoLD();
+cryptoLd.use(Ed25519VerificationKey2020);
 
 /**
  * Verifies a zcap invocation in the form of an http-signature header.
@@ -97,10 +101,11 @@ export async function verifyCapabilityInvocation({
   // get parsed parameters from from HTTP header and generate signing string
   const {keyId, signingString, params: {signature: b64Signature}} = parsed;
 
+  // FIXME: to be addressed immediately, use forthcoming crytoLd.fromKeyId API
   // fetch verification method from `keyId` and import as a crypto-ld key
   const verificationMethod = await _getVerificationMethod(
     {keyId, documentLoader});
-  const key = await LDKeyPair.from(verificationMethod);
+  const key = await cryptoLd.from(verificationMethod);
 
   // verify HTTP signature
   const verifier = key.verifier();
@@ -185,25 +190,17 @@ export async function verifyCapabilityInvocation({
   };
 }
 
+// FIXME: THIS WILL BE FACTORED OUT WITH FORTHCOMING CRYPTOLD API
 async function _getVerificationMethod({keyId, documentLoader}) {
-  // Note: `expansionMap` is intentionally not passed; we can safely drop
-  // properties here and must allow for it
-  const {'@graph': [framed]} = await frame(keyId, {
-    '@context': SECURITY_CONTEXT_V2_URL,
-    '@embed': '@always',
-    id: keyId,
-    controller: {'@embed': '@never'}
-  }, {documentLoader, compactToRelative: false});
-  if(!framed) {
-    throw new Error(`Verification method ${keyId} not found.`);
+  const {document} = await documentLoader(keyId);
+  if(!document) {
+    throw new Error('Could not retrieve a JSON-LD document from the URL.');
   }
-
   // ensure verification method has not been revoked
-  if(framed.revoked !== undefined) {
+  if(document.revoked !== undefined) {
     throw new Error('The verification method has been revoked.');
   }
-
-  return framed;
+  return document;
 }
 
 function _lowerCaseObjectKeys(obj) {
