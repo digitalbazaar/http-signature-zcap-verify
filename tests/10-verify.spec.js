@@ -3,40 +3,35 @@
  */
 import {verifyCapabilityInvocation} from '..';
 import {signCapabilityInvocation} from 'http-signature-zcap-invoke';
-import {suites, SECURITY_CONTEXT_V2_URL} from 'jsonld-signatures';
-import {Ed25519KeyPair, RSAKeyPair} from 'crypto-ld';
-import uuid from 'uuid-random';
+import {SECURITY_CONTEXT_V2_URL} from 'jsonld-signatures';
+import {Ed25519VerificationKey2020} from
+  '@digitalbazaar/ed25519-verification-key-2020';
+import {Ed25519Signature2020} from '@digitalbazaar/ed25519-signature-2020';
+import {CryptoLD} from 'crypto-ld';
 
-const {Ed25519Signature2018, RsaSignature2018} = suites;
+const cryptoLd = new CryptoLD();
+cryptoLd.use(Ed25519VerificationKey2020);
 
 const Ed25519 = {
-  type: 'Ed25519',
-  Suite: Ed25519Signature2018,
-  LDKeyPair: Ed25519KeyPair,
-};
-
-const Rsa = {
-  type: 'RSA',
-  Suite: RsaSignature2018,
-  LDKeyPair: RSAKeyPair
+  type: 'Ed25519VerificationKey2020',
+  Suite: Ed25519Signature2020,
 };
 
 const controller = 'did:test:controller';
-const delegator = 'did:test:delegator';
 const url = 'https://test.org/zcaps/foo';
 const method = 'GET';
 
-const setup = async ({Suite, LDKeyPair}) => {
+const setup = async ({Suite, type}) => {
   let expectedHost = 'test.org';
   if(typeof window !== 'undefined') {
     expectedHost = window.location.host; // eslint-disable-line no-undef
   }
   // the tests will use a mock didKey.
-  const keyId = `did:key:${uuid()}`;
-  const keyPair = await LDKeyPair.generate({
-    id: keyId,
-    controller
+  const keyPair = await cryptoLd.generate({
+    controller,
+    type,
   });
+  const {id: keyId} = keyPair;
   const suite = new Suite({
     verificationMethod: keyId,
     key: keyPair
@@ -48,8 +43,6 @@ const setup = async ({Suite, LDKeyPair}) => {
     id: url,
     invocationTarget: url,
     controller,
-    delegator,
-    invoker: keyId
   };
 
   const documentLoader = async uri => {
@@ -71,7 +64,7 @@ const setup = async ({Suite, LDKeyPair}) => {
     // when we dereference the keyId for verification
     // all we need is the publicNode
     if(uri === keyId) {
-      const doc = keyPair.publicNode();
+      const doc = keyPair.export({publicKey: true});
       doc['@context'] = SECURITY_CONTEXT_V2_URL;
       doc.controller = controller;
       return {
@@ -119,7 +112,7 @@ const setup = async ({Suite, LDKeyPair}) => {
 };
 
 describe('verifyCapabilityInvocation', function() {
-  [Ed25519, Rsa].forEach(function(suiteType) {
+  [Ed25519].forEach(function(suiteType) {
 
     describe(suiteType.type, function() {
       let suite,
@@ -214,41 +207,6 @@ describe('verifyCapabilityInvocation', function() {
           should.not.exist(result);
           should.exist(error);
           error.message.should.contain('verification method has been revoked');
-        });
-
-      it('should THROW if verificationMethod can not be framed',
-        async function() {
-          let result, error = null;
-          const _documentLoader = async uri => {
-            if(keyId === uri) {
-              const doc = {id: keyId};
-              return {
-                contextUrl: null,
-                documentUrl: uri,
-                document: doc
-              };
-            }
-            return documentLoader(uri);
-          };
-          try {
-            result = await verifyCapabilityInvocation({
-              url,
-              method,
-              suite,
-              getInvokedCapability,
-              documentLoader: _documentLoader,
-              headers: signed,
-              expectedHost,
-              expectedTarget: url,
-              keyId
-            });
-          } catch(e) {
-            error = e;
-          }
-          should.not.exist(result);
-          should.exist(error);
-          error.message.should.contain(
-            `Verification method ${keyId} not found.`);
         });
 
       it('should THROW if no getInvokedCapability', async function() {
@@ -385,7 +343,8 @@ describe('verifyCapabilityInvocation', function() {
           }
           should.not.exist(result);
           should.exist(error);
-          error.message.should.contain('Unsupported Key Type');
+          error.message.should.contain(
+            'Support for key type "AESVerificationKey2001" is not installed.');
         });
 
       it('should NOT verify unless both content-type and digest are set',
