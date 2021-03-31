@@ -53,6 +53,7 @@ module.exports = function(config) {
       },
       resolve: {
         fallback: {
+          crypto: false,
           url: false,
           util: false,
         }
