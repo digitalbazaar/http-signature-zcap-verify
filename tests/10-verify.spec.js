@@ -21,13 +21,15 @@ const controller = 'did:test:controller';
 const url = 'https://test.org/zcaps/foo';
 const method = 'GET';
 
+let keyPair;
+
 const setup = async ({Suite, type}) => {
   let expectedHost = 'test.org';
   if(typeof window !== 'undefined') {
     expectedHost = window.location.host; // eslint-disable-line no-undef
   }
   // the tests will use a mock didKey.
-  const keyPair = await cryptoLd.generate({
+  keyPair = await cryptoLd.generate({
     controller,
     type,
   });
@@ -64,9 +66,7 @@ const setup = async ({Suite, type}) => {
     // when we dereference the keyId for verification
     // all we need is the publicNode
     if(uri === keyId) {
-      const doc = keyPair.export({publicKey: true});
-      doc['@context'] = SECURITY_CONTEXT_V2_URL;
-      doc.controller = controller;
+      const doc = keyPair.export({publicKey: true, includeContext: true});
       return {
         contextUrl: null,
         documentUrl: uri,
@@ -175,19 +175,20 @@ describe('verifyCapabilityInvocation', function() {
       it('should THROW if verificationMethod has been revoked',
         async function() {
           let result, error = null;
-          const _documentLoader = async uri => {
-            if(keyId === uri) {
-              const doc = {id: keyId};
-              doc['@context'] = SECURITY_CONTEXT_V2_URL;
-              doc.controller = controller;
-              doc.revoked = 'foo';
+          const pastDate = new Date(2020, 11, 17).toISOString()
+            .replace(/\.[0-9]{3}/, '');
+          const _documentLoader = async url => {
+            if(keyId === url) {
+              const doc = keyPair.export(
+                {publicKey: true, includeContext: true});
+              doc.revoked = pastDate;
               return {
                 contextUrl: null,
-                documentUrl: uri,
+                documentUrl: url,
                 document: doc
               };
             }
-            return documentLoader(uri);
+            return documentLoader(url);
           };
           try {
             result = await verifyCapabilityInvocation({
@@ -206,7 +207,8 @@ describe('verifyCapabilityInvocation', function() {
           }
           should.not.exist(result);
           should.exist(error);
-          error.message.should.contain('verification method has been revoked');
+          error.message.should.contain('revoked');
+          error.message.should.contain(pastDate);
         });
 
       it('should THROW if no getInvokedCapability', async function() {
@@ -277,14 +279,7 @@ describe('verifyCapabilityInvocation', function() {
         'documentLoader', async function() {
         let result, error = null;
         const _documentLoader = async uri => {
-          if(uri === keyId) {
-            return {
-              contextUrl: null,
-              documentUrl: uri,
-              document: null
-            };
-          }
-          return documentLoader(uri);
+          throw new Error(`NotFoundError: ${uri}`);
         };
         try {
           result = await verifyCapabilityInvocation({
@@ -303,8 +298,7 @@ describe('verifyCapabilityInvocation', function() {
         }
         should.exist(error);
         should.not.exist(result);
-        error.message.should.equal('Could not retrieve a JSON-LD ' +
-          'document from the URL.');
+        error.message.should.contain('NotFoundError');
       });
 
       it('should THROW if verificationMethod type is not supported',
@@ -344,7 +338,7 @@ describe('verifyCapabilityInvocation', function() {
           should.not.exist(result);
           should.exist(error);
           error.message.should.contain(
-            'Support for key type "AESVerificationKey2001" is not installed.');
+            '"AESVerificationKey2001" is not installed.');
         });
 
       it('should NOT verify unless both content-type and digest are set',

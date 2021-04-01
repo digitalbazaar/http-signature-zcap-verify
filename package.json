@@ -20,9 +20,9 @@
     "util.js"
   ],
   "dependencies": {
-    "@digitalbazaar/ed25519-verification-key-2020": "^2.0.0",
+    "@digitalbazaar/ed25519-verification-key-2020": "digitalbazaar/ed25519-verification-key-2020#revoked",
     "base64url-universal": "^1.0.0",
-    "crypto-ld": "^5.0.0",
+    "crypto-ld": "digitalbazaar/crypto-ld#from-id",
     "esm": "^3.2.22",
     "http-signature-header": "^2.0.1",
     "jsonld-signatures": "^8.0.0",
