@@ -101,11 +101,10 @@ export async function verifyCapabilityInvocation({
   // get parsed parameters from from HTTP header and generate signing string
   const {keyId, signingString, params: {signature: b64Signature}} = parsed;
 
-  // FIXME: to be addressed immediately, use forthcoming crytoLd.fromKeyId API
-  // fetch verification method from `keyId` and import as a crypto-ld key
-  const verificationMethod = await _getVerificationMethod(
-    {keyId, documentLoader});
-  const key = await cryptoLd.from(verificationMethod);
+  // fromKeyId ensures that the key is valid and is not revoked
+  const key = await cryptoLd.fromKeyId({id: keyId, documentLoader});
+  const verificationMethod = await key.export(
+    {publicKey: true, includeContext: true});
 
   // verify HTTP signature
   const verifier = key.verifier();
@@ -188,19 +187,6 @@ export async function verifyCapabilityInvocation({
     capabilityAction,
     verificationMethod
   };
-}
-
-// FIXME: THIS WILL BE FACTORED OUT WITH FORTHCOMING CRYPTOLD API
-async function _getVerificationMethod({keyId, documentLoader}) {
-  const {document} = await documentLoader(keyId);
-  if(!document) {
-    throw new Error('Could not retrieve a JSON-LD document from the URL.');
-  }
-  // ensure verification method has not been revoked
-  if(document.revoked !== undefined) {
-    throw new Error('The verification method has been revoked.');
-  }
-  return document;
 }
 
 function _lowerCaseObjectKeys(obj) {
