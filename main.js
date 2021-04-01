@@ -155,9 +155,6 @@ export async function verifyCapabilityInvocation({
   }
 
   // check capability invocation
-  // TODO: add parameters to check any other caveats in the capability as
-  // appropriate... noting that caveats like "file size" can't be checked
-  // until the file received hits the limit, so that won't happen here
   const purpose = new CapabilityInvocation({
     allowTargetAttenuation,
     expectedTarget,
