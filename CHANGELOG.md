@@ -1,6 +1,6 @@
 # http-signature-zcap-verify ChangeLog
 
-## 5.0.0 - TBD
+## 5.0.0 - 2021-04-01
 
 ### Changed
 - **BREAKING**: Only support `Ed25519Signature2020` proofs.
