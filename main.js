@@ -8,7 +8,7 @@ import pako from 'pako';
 import {CryptoLD} from 'crypto-ld';
 import {extendContextLoader} from 'jsonld-signatures';
 import {parseRequest, parseSignatureHeader} from 'http-signature-header';
-import {CapabilityInvocation} from 'ocapld';
+import {CapabilityInvocation} from '@digitalbazaar/zcapld';
 import {TextDecoder, TextEncoder, base64Decode} from './util.js';
 import {Ed25519VerificationKey2020} from
   '@digitalbazaar/ed25519-verification-key-2020';
