@@ -1,6 +1,6 @@
 # http-signature-zcap-verify ChangeLog
 
-## 6.0.0 -
+## 6.0.0 - 2021-04-06
 
 ### Changed
 - **BREAKING**: Use `@digitalbazaar/zcapld@3.0` instead of `ocapld@v2.0`.
