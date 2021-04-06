@@ -4,6 +4,8 @@
 
 ### Changed
 - **BREAKING**: Use `@digitalbazaar/zcapld@3.0` instead of `ocapld@v2.0`.
+  `zcapld` required Node.js >= 12.
+- **BREAKING**: Node.js >= 12 is now required.
 
 ## 5.0.0 - 2021-04-01
 
