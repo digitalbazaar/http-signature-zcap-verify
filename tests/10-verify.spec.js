@@ -115,12 +115,12 @@ describe('verifyCapabilityInvocation', function() {
   [Ed25519].forEach(function(suiteType) {
 
     describe(suiteType.type, function() {
-      let suite,
-        documentLoader,
-        keyId,
-        getInvokedCapability,
-        signed,
-        expectedHost = null;
+      let suite = null;
+      let documentLoader = null;
+      let keyId = null;
+      let getInvokedCapability = null;
+      let signed = null;
+      let expectedHost = null;
 
       beforeEach(async function() {
         ({
@@ -174,7 +174,8 @@ describe('verifyCapabilityInvocation', function() {
 
       it('should THROW if verificationMethod has been revoked',
         async function() {
-          let result, error = null;
+          let result;
+          let error = null;
           const pastDate = new Date(2020, 11, 17).toISOString()
             .replace(/\.[0-9]{3}/, '');
           const _documentLoader = async url => {
@@ -212,7 +213,8 @@ describe('verifyCapabilityInvocation', function() {
         });
 
       it('should THROW if no getInvokedCapability', async function() {
-        let result, error = null;
+        let result;
+        let error = null;
         try {
           result = await verifyCapabilityInvocation({
             url,
@@ -233,7 +235,8 @@ describe('verifyCapabilityInvocation', function() {
       });
 
       it('should THROW if no documentLoader', async function() {
-        let result, error = null;
+        let result;
+        let error = null;
         try {
           result = await verifyCapabilityInvocation({
             url,
@@ -254,7 +257,8 @@ describe('verifyCapabilityInvocation', function() {
       });
 
       it('should THROW if there are no headers', async function() {
-        let result, error = null;
+        let result;
+        let error = null;
         try {
           result = await verifyCapabilityInvocation({
             url,
@@ -277,7 +281,8 @@ describe('verifyCapabilityInvocation', function() {
 
       it('should THROW if keyId can not be dereferenced by the ' +
         'documentLoader', async function() {
-        let result, error = null;
+        let result;
+        let error = null;
         const _documentLoader = async uri => {
           throw new Error(`NotFoundError: ${uri}`);
         };
@@ -303,7 +308,8 @@ describe('verifyCapabilityInvocation', function() {
 
       it('should THROW if verificationMethod type is not supported',
         async function() {
-          let result, error = null;
+          let result;
+          let error = null;
           const _documentLoader = async uri => {
             if(uri === keyId) {
               const doc = {
@@ -343,7 +349,8 @@ describe('verifyCapabilityInvocation', function() {
 
       it('should NOT verify unless both content-type and digest are set',
         async function() {
-          let result, error = null;
+          let result;
+          let error = null;
           delete signed.digest;
           try {
             result = await verifyCapabilityInvocation({
@@ -370,7 +377,8 @@ describe('verifyCapabilityInvocation', function() {
         });
 
       it('should NOT verify if there is no url', async function() {
-        let result, error = null;
+        let result;
+        let error = null;
         try {
           result = await verifyCapabilityInvocation({
             method,
@@ -395,7 +403,8 @@ describe('verifyCapabilityInvocation', function() {
       });
 
       it('should NOT verify if host is not in expectedHost', async function() {
-        let result, error = null;
+        let result;
+        let error = null;
         try {
           result = await verifyCapabilityInvocation({
             url,
@@ -422,7 +431,8 @@ describe('verifyCapabilityInvocation', function() {
       });
 
       it('should NOT verify if Signature is missing keyId', async function() {
-        let result, error = null;
+        let result;
+        let error = null;
         // this is just to ensure no keyId is passed in headers
         delete signed.keyid;
         const keyIdReplacer = /keyId\=\"[^"]+\"\,/i;
@@ -455,7 +465,8 @@ describe('verifyCapabilityInvocation', function() {
 
       it('should NOT verify if Signature is missing created',
         async function() {
-          let result, error = null;
+          let result;
+          let error = null;
           const createdReplacer = /created\=\"[^"]+\"\,/i;
           // this will remove created from the signature
           // this is where the error should come from
@@ -487,7 +498,8 @@ describe('verifyCapabilityInvocation', function() {
 
       it('should NOT verify if Signature is missing expires',
         async function() {
-          let result, error = null;
+          let result;
+          let error = null;
           const expiresReplacer = /expires\=\"[^"]+\"\,?/i;
           // this will remove created from the signature
           // this is where the error should come from
@@ -519,7 +531,8 @@ describe('verifyCapabilityInvocation', function() {
 
       it('should NOT verify if there is no method',
         async function() {
-          let result, error = null;
+          let result;
+          let error = null;
           try {
             result = await verifyCapabilityInvocation({
               url,
@@ -544,7 +557,8 @@ describe('verifyCapabilityInvocation', function() {
         });
 
       it('should NOT verify if headers is missing host', async function() {
-        let result, error = null;
+        let result;
+        let error = null;
         delete signed.host;
         try {
           result = await verifyCapabilityInvocation({
@@ -573,7 +587,8 @@ describe('verifyCapabilityInvocation', function() {
 
       it('should NOT verify with additionalHeaders not used in Signature',
         async function() {
-          let result, error = null;
+          let result;
+          let error = null;
           try {
             result = await verifyCapabilityInvocation({
               additionalHeaders: ['foo'],
@@ -601,7 +616,8 @@ describe('verifyCapabilityInvocation', function() {
 
       it('should NOT verify if headers is missing capability-invocation',
         async function() {
-          let result, error = null;
+          let result;
+          let error = null;
           delete signed['capability-invocation'];
           try {
             result = await verifyCapabilityInvocation({
