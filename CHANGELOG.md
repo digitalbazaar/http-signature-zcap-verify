@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 7.0.0 - 2021-04-TBD
+
+### Changed
+- **BREAKING**: Use [`@digitalbazaar/zcapld@4.0`](https://github.com/digitalbazaar/zcapld/blob/main/CHANGELOG.md).
+
 ## 6.0.0 - 2021-04-06
 
 ### Changed
