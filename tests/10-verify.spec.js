@@ -3,12 +3,34 @@
  */
 import {verifyCapabilityInvocation} from '..';
 import {signCapabilityInvocation} from 'http-signature-zcap-invoke';
-import {SECURITY_CONTEXT_V2_URL} from 'jsonld-signatures';
 import {Ed25519VerificationKey2020} from
   '@digitalbazaar/ed25519-verification-key-2020';
 import {Ed25519Signature2020} from '@digitalbazaar/ed25519-signature-2020';
 import {CryptoLD} from 'crypto-ld';
+import {securityLoader} from '@digitalbazaar/security-document-loader';
+import zcapCtx from 'zcap-context';
+import aesContext from 'aes-key-wrapping-2019-context';
+import hmacContext from 'sha256-hmac-key-2019-context';
+import secCtx from '@digitalbazaar/security-context';
 
+const controller = 'did:test:controller';
+
+const loader = securityLoader();
+loader.addStatic(zcapCtx.CONTEXT_URL, zcapCtx.CONTEXT);
+loader.addStatic(
+  aesContext.constants.CONTEXT_URL, aesContext.contexts);
+loader.addStatic(
+  hmacContext.constants.CONTEXT_URL, hmacContext.contexts);
+loader.addStatic(
+  secCtx.SECURITY_CONTEXT_V2_URL,
+  secCtx.contexts.get(secCtx.SECURITY_CONTEXT_V2_URL)
+);
+loader.addStatic(
+  secCtx.SECURITY_CONTEXT_V1_URL,
+  secCtx.contexts.get(secCtx.SECURITY_CONTEXT_V1_URL)
+);
+
+const securityDocumentLoader = loader.build();
 const cryptoLd = new CryptoLD();
 cryptoLd.use(Ed25519VerificationKey2020);
 
@@ -17,8 +39,7 @@ const Ed25519 = {
   Suite: Ed25519Signature2020,
 };
 
-const controller = 'did:test:controller';
-const url = 'https://test.org/zcaps/foo';
+const invocationResourceUrl = 'https://test.org/zcaps/foo';
 const method = 'GET';
 
 let keyPair;
@@ -41,9 +62,9 @@ const setup = async ({Suite, type}) => {
 
   // this is a zCap
   const rootCapability = {
-    '@context': SECURITY_CONTEXT_V2_URL,
-    id: url,
-    invocationTarget: url,
+    '@context': zcapCtx.CONTEXT_URL,
+    id: invocationResourceUrl,
+    invocationTarget: invocationResourceUrl,
     controller,
   };
 
@@ -54,7 +75,7 @@ const setup = async ({Suite, type}) => {
     if(uri === controller) {
       const doc = {
         id: controller,
-        '@context': SECURITY_CONTEXT_V2_URL,
+        '@context': zcapCtx.CONTEXT_URL,
         capabilityInvocation: [keyId]
       };
       return {
@@ -73,14 +94,15 @@ const setup = async ({Suite, type}) => {
         document: doc
       };
     }
-    if(uri === url) {
+    if(uri === invocationResourceUrl) {
       return {
         contextUrl: null,
         documentUrl: uri,
         document: rootCapability
       };
     }
-    throw new Error(`documentLoader unable to resolve ${uri}`);
+    return securityDocumentLoader(uri);
+    // throw new Error(`documentLoader unable to resolve ${uri}`);
   };
   const getInvokedCapability = () => rootCapability;
   const created = Date.now() - 1000;
@@ -88,7 +110,7 @@ const setup = async ({Suite, type}) => {
   const invocationSigner = keyPair.signer();
   invocationSigner.id = keyId;
   const signed = await signCapabilityInvocation({
-    url,
+    url: invocationResourceUrl,
     method,
     headers: {
       keyId,
@@ -135,14 +157,14 @@ describe('verifyCapabilityInvocation', function() {
 
       it('should verify a valid request', async function() {
         const result = await verifyCapabilityInvocation({
-          url,
+          url: invocationResourceUrl,
           method,
           suite,
           headers: signed,
           expectedHost,
           getInvokedCapability,
           documentLoader,
-          expectedTarget: url,
+          expectedTarget: invocationResourceUrl,
           keyId
         });
         should.exist(result);
@@ -155,14 +177,14 @@ describe('verifyCapabilityInvocation', function() {
       it('should verify a valid request with multiple expectedHosts',
         async function() {
           const result = await verifyCapabilityInvocation({
-            url,
+            url: invocationResourceUrl,
             method,
             suite,
             headers: signed,
             expectedHost: [expectedHost, 'bar.org'],
             getInvokedCapability,
             documentLoader,
-            expectedTarget: url,
+            expectedTarget: invocationResourceUrl,
             keyId
           });
           should.exist(result);
@@ -193,14 +215,14 @@ describe('verifyCapabilityInvocation', function() {
           };
           try {
             result = await verifyCapabilityInvocation({
-              url,
+              url: invocationResourceUrl,
               method,
               suite,
               getInvokedCapability,
               documentLoader: _documentLoader,
               headers: signed,
               expectedHost,
-              expectedTarget: url,
+              expectedTarget: invocationResourceUrl,
               keyId
             });
           } catch(e) {
@@ -217,13 +239,13 @@ describe('verifyCapabilityInvocation', function() {
         let error = null;
         try {
           result = await verifyCapabilityInvocation({
-            url,
+            url: invocationResourceUrl,
             method,
             suite,
             headers: signed,
             expectedHost,
             documentLoader,
-            expectedTarget: url,
+            expectedTarget: invocationResourceUrl,
             keyId
           });
         } catch(e) {
@@ -239,13 +261,13 @@ describe('verifyCapabilityInvocation', function() {
         let error = null;
         try {
           result = await verifyCapabilityInvocation({
-            url,
+            url: invocationResourceUrl,
             method,
             suite,
             getInvokedCapability,
             headers: signed,
             expectedHost,
-            expectedTarget: url,
+            expectedTarget: invocationResourceUrl,
             keyId
           });
         } catch(e) {
@@ -261,13 +283,13 @@ describe('verifyCapabilityInvocation', function() {
         let error = null;
         try {
           result = await verifyCapabilityInvocation({
-            url,
+            url: invocationResourceUrl,
             method,
             suite,
             getInvokedCapability,
             documentLoader,
             expectedHost,
-            expectedTarget: url,
+            expectedTarget: invocationResourceUrl,
             keyId
           });
         } catch(e) {
@@ -288,14 +310,14 @@ describe('verifyCapabilityInvocation', function() {
         };
         try {
           result = await verifyCapabilityInvocation({
-            url,
+            url: invocationResourceUrl,
             method,
             suite,
             getInvokedCapability,
             documentLoader: _documentLoader,
             headers: signed,
             expectedHost,
-            expectedTarget: url,
+            expectedTarget: invocationResourceUrl,
             keyId
           });
         } catch(e) {
@@ -314,7 +336,7 @@ describe('verifyCapabilityInvocation', function() {
             if(uri === keyId) {
               const doc = {
                 id: uri,
-                '@context': SECURITY_CONTEXT_V2_URL,
+                '@context': zcapCtx.CONTEXT_URL,
                 controller,
                 type: 'AESVerificationKey2001'
               };
@@ -328,14 +350,14 @@ describe('verifyCapabilityInvocation', function() {
           };
           try {
             result = await verifyCapabilityInvocation({
-              url,
+              url: invocationResourceUrl,
               method,
               suite,
               getInvokedCapability,
               documentLoader: _documentLoader,
               headers: signed,
               expectedHost,
-              expectedTarget: url,
+              expectedTarget: invocationResourceUrl,
               keyId
             });
           } catch(e) {
@@ -354,14 +376,14 @@ describe('verifyCapabilityInvocation', function() {
           delete signed.digest;
           try {
             result = await verifyCapabilityInvocation({
-              url,
+              url: invocationResourceUrl,
               method,
               suite,
               getInvokedCapability,
               documentLoader,
               headers: signed,
               expectedHost,
-              expectedTarget: url,
+              expectedTarget: invocationResourceUrl,
               keyId
             });
           } catch(e) {
@@ -387,7 +409,7 @@ describe('verifyCapabilityInvocation', function() {
             documentLoader,
             headers: signed,
             expectedHost,
-            expectedTarget: url,
+            expectedTarget: invocationResourceUrl,
             keyId
           });
         } catch(e) {
@@ -407,14 +429,14 @@ describe('verifyCapabilityInvocation', function() {
         let error = null;
         try {
           result = await verifyCapabilityInvocation({
-            url,
+            url: invocationResourceUrl,
             method,
             suite,
             getInvokedCapability,
             documentLoader,
             headers: signed,
             expectedHost: 'not-foo.org',
-            expectedTarget: url,
+            expectedTarget: invocationResourceUrl,
             keyId
           });
         } catch(e) {
@@ -441,14 +463,14 @@ describe('verifyCapabilityInvocation', function() {
         signed.authorization = signed.authorization.replace(keyIdReplacer, '');
         try {
           result = await verifyCapabilityInvocation({
-            url,
+            url: invocationResourceUrl,
             method,
             suite,
             getInvokedCapability,
             documentLoader,
             headers: signed,
             expectedHost,
-            expectedTarget: url,
+            expectedTarget: invocationResourceUrl,
             keyId
           });
         } catch(e) {
@@ -474,14 +496,14 @@ describe('verifyCapabilityInvocation', function() {
             createdReplacer, '');
           try {
             result = await verifyCapabilityInvocation({
-              url,
+              url: invocationResourceUrl,
               method,
               suite,
               getInvokedCapability,
               documentLoader,
               headers: signed,
               expectedHost,
-              expectedTarget: url,
+              expectedTarget: invocationResourceUrl,
               keyId
             });
           } catch(e) {
@@ -507,14 +529,14 @@ describe('verifyCapabilityInvocation', function() {
             expiresReplacer, '');
           try {
             result = await verifyCapabilityInvocation({
-              url,
+              url: invocationResourceUrl,
               method,
               suite,
               getInvokedCapability,
               documentLoader,
               headers: signed,
               expectedHost,
-              expectedTarget: url,
+              expectedTarget: invocationResourceUrl,
               keyId
             });
           } catch(e) {
@@ -535,13 +557,13 @@ describe('verifyCapabilityInvocation', function() {
           let error = null;
           try {
             result = await verifyCapabilityInvocation({
-              url,
+              url: invocationResourceUrl,
               suite,
               getInvokedCapability,
               documentLoader,
               headers: signed,
               expectedHost,
-              expectedTarget: url,
+              expectedTarget: invocationResourceUrl,
               keyId
             });
           } catch(e) {
@@ -562,14 +584,14 @@ describe('verifyCapabilityInvocation', function() {
         delete signed.host;
         try {
           result = await verifyCapabilityInvocation({
-            url,
+            url: invocationResourceUrl,
             method,
             suite,
             getInvokedCapability,
             documentLoader,
             headers: signed,
             expectedHost,
-            expectedTarget: url,
+            expectedTarget: invocationResourceUrl,
             keyId
           });
         } catch(e) {
@@ -592,14 +614,14 @@ describe('verifyCapabilityInvocation', function() {
           try {
             result = await verifyCapabilityInvocation({
               additionalHeaders: ['foo'],
-              url,
+              url: invocationResourceUrl,
               method,
               suite,
               getInvokedCapability,
               documentLoader,
               headers: signed,
               expectedHost,
-              expectedTarget: url,
+              expectedTarget: invocationResourceUrl,
               keyId
             });
           } catch(e) {
@@ -621,14 +643,14 @@ describe('verifyCapabilityInvocation', function() {
           delete signed['capability-invocation'];
           try {
             result = await verifyCapabilityInvocation({
-              url,
+              url: invocationResourceUrl,
               method,
               suite,
               getInvokedCapability,
               documentLoader,
               headers: signed,
               expectedHost,
-              expectedTarget: url,
+              expectedTarget: invocationResourceUrl,
               keyId
             });
           } catch(e) {

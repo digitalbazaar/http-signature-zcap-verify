@@ -6,7 +6,6 @@
 import base64url from 'base64url-universal';
 import pako from 'pako';
 import {CryptoLD} from 'crypto-ld';
-import {extendContextLoader} from 'jsonld-signatures';
 import {parseRequest, parseSignatureHeader} from 'http-signature-header';
 import {CapabilityInvocation} from '@digitalbazaar/zcapld';
 import {TextDecoder, TextEncoder, base64Decode} from './util.js';
@@ -56,9 +55,6 @@ export async function verifyCapabilityInvocation({
       '"getInvokedCapability" must be given to dereference the ' +
       'invoked capability.');
   }
-
-  // wrap doc loader to ensure local security contexts are always used
-  documentLoader = extendContextLoader(documentLoader);
 
   // parse http header for signature
   const expectedHeaders = [
