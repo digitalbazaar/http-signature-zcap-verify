@@ -7,30 +7,11 @@ import {Ed25519VerificationKey2020} from
   '@digitalbazaar/ed25519-verification-key-2020';
 import {Ed25519Signature2020} from '@digitalbazaar/ed25519-signature-2020';
 import {CryptoLD} from 'crypto-ld';
-import {securityLoader} from '@digitalbazaar/security-document-loader';
 import zcapCtx from 'zcap-context';
-import aesContext from 'aes-key-wrapping-2019-context';
-import hmacContext from 'sha256-hmac-key-2019-context';
-import secCtx from '@digitalbazaar/security-context';
+import {securityDocumentLoader} from './document-loader.js';
 
 const controller = 'did:test:controller';
 
-const loader = securityLoader();
-loader.addStatic(zcapCtx.CONTEXT_URL, zcapCtx.CONTEXT);
-loader.addStatic(
-  aesContext.constants.CONTEXT_URL, aesContext.contexts);
-loader.addStatic(
-  hmacContext.constants.CONTEXT_URL, hmacContext.contexts);
-loader.addStatic(
-  secCtx.SECURITY_CONTEXT_V2_URL,
-  secCtx.contexts.get(secCtx.SECURITY_CONTEXT_V2_URL)
-);
-loader.addStatic(
-  secCtx.SECURITY_CONTEXT_V1_URL,
-  secCtx.contexts.get(secCtx.SECURITY_CONTEXT_V1_URL)
-);
-
-const securityDocumentLoader = loader.build();
 const cryptoLd = new CryptoLD();
 cryptoLd.use(Ed25519VerificationKey2020);
 
