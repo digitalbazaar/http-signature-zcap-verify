@@ -1,9 +1,9 @@
 # http-signature-zcap-verify ChangeLog
 
-## 7.0.1 - 2021-TBD
+## 7.1.0 - 2021-05-04
 
 ### Changed
-- Remove `jsonld-signatures@8.0`.
+- Remove `jsonld-signatures@8.0` dependency.
 - Update deps in test and fix tests.
 
 ## 7.0.0 - 2021-04-26
