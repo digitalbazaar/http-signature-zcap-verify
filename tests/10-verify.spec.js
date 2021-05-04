@@ -102,7 +102,6 @@ const setup = async ({Suite, type}) => {
       };
     }
     return securityDocumentLoader(uri);
-    // throw new Error(`documentLoader unable to resolve ${uri}`);
   };
   const getInvokedCapability = () => rootCapability;
   const created = Date.now() - 1000;
