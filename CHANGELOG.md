@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 7.2.0 - 2021-xx-xx
+
+### Changed
+- Update to zcapld@5.x.
+
 ## 7.1.0 - 2021-05-04
 
 ### Changed
