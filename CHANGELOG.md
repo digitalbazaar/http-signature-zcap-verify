@@ -1,6 +1,6 @@
 # http-signature-zcap-verify ChangeLog
 
-## 8.0.0 - 2021-07-xx
+## 8.0.0 - 2021-07-10
 
 ### Changed
 - **BREAKING**: Updated ed25519 signature and key libraries to new major versions
