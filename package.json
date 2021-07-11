@@ -20,10 +20,10 @@
     "util.js"
   ],
   "dependencies": {
-    "@digitalbazaar/ed25519-verification-key-2020": "^2.1.0",
+    "@digitalbazaar/ed25519-verification-key-2020": "^3.1.0",
     "@digitalbazaar/zcapld": "^5.0.0",
     "base64url-universal": "^1.0.0",
-    "crypto-ld": "^5.1.0",
+    "crypto-ld": "^6.0.0",
     "esm": "^3.2.22",
     "http-signature-header": "^2.0.1",
     "pako": "^2.0.3"
@@ -34,14 +34,14 @@
     "@babel/plugin-transform-runtime": "^7.4.3",
     "@babel/preset-env": "^7.4.3",
     "@babel/runtime": "^7.4.3",
-    "@digitalbazaar/ed25519-signature-2020": "^2.1.0",
+    "@digitalbazaar/ed25519-signature-2020": "^3.0.0",
     "@digitalbazaar/security-document-loader": "^1.0.0",
     "aes-key-wrapping-2019-context": "^1.0.3",
     "babel-loader": "^8.0.5",
     "chai": "^4.2.0",
     "chai-bytes": "^0.1.2",
     "cross-env": "^5.2.0",
-    "eslint": "^7.16.0",
+    "eslint": "^7.30.0",
     "eslint-config-digitalbazaar": "^2.6.1",
     "http-signature-zcap-invoke": "^3.0.0",
     "karma": "^6.1.1",
@@ -60,7 +60,7 @@
     "sha256-hmac-key-2019-context": "^1.0.3",
     "sinon": "^9.0.0",
     "uuid-random": "^1.0.8",
-    "webpack": "^5.24.2",
+    "webpack": "^5.44.0",
     "zcap-context": "^1.2.1"
   },
   "repository": {

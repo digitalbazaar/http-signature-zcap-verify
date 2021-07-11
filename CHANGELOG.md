@@ -1,5 +1,13 @@
 # http-signature-zcap-verify ChangeLog
 
+## 8.0.0 - 2021-07-xx
+
+### Changed
+- **BREAKING**: Updated ed25519 signature and key libraries to new major versions
+  that address problems with key formats. These changes are not backwards compatible;
+  systems updating this library will only be able to verify invocations from properly
+  formatted keys.
+
 ## 7.2.0 - 2021-07-02
 
 ### Changed
