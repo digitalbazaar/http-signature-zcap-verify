@@ -21,7 +21,7 @@
   ],
   "dependencies": {
     "@digitalbazaar/ed25519-verification-key-2020": "^3.1.0",
-    "@digitalbazaar/zcapld": "^5.0.0",
+    "@digitalbazaar/zcapld": "^5.1.0",
     "base64url-universal": "^1.0.0",
     "crypto-ld": "^6.0.0",
     "esm": "^3.2.22",

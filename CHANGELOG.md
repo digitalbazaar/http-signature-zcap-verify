@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 8.1.0 - 2021-07-xx
+
+### Changed
+- Use zcapld@5.1.x, which brings in DID document-based optimizations.
+
 ## 8.0.0 - 2021-07-10
 
 ### Changed
