@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 8.1.1 - 2021-07-xx
+
+### Fixed
+- Ensure that zcap context is included in proof.
+
 ## 8.1.0 - 2021-07-11
 
 ### Changed
