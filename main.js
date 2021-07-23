@@ -7,7 +7,7 @@ import base64url from 'base64url-universal';
 import pako from 'pako';
 import {CryptoLD} from 'crypto-ld';
 import {parseRequest, parseSignatureHeader} from 'http-signature-header';
-import {CapabilityInvocation} from '@digitalbazaar/zcapld';
+import {CapabilityInvocation, constants} from '@digitalbazaar/zcapld';
 import {TextDecoder, TextEncoder, base64Decode} from './util.js';
 import {Ed25519VerificationKey2020} from
   '@digitalbazaar/ed25519-verification-key-2020';
@@ -161,6 +161,7 @@ export async function verifyCapabilityInvocation({
   });
   const capabilityAction = parsedInvocationHeader.params.action;
   const proof = {
+    '@context': constants.ZCAP_CONTEXT_URL,
     capability,
     capabilityAction,
     verificationMethod: keyId
