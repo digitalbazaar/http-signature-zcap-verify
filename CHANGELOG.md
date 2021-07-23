@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 7.2.1 - 2021-07-23
+
+### Changed
+- Backport fix to work with zcapld@5.
+
 ## 7.2.0 - 2021-07-02
 
 ### Changed
