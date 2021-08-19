@@ -153,7 +153,27 @@ describe('verifyCapabilityInvocation', function() {
         result.verified.should.be.an('boolean');
         result.verified.should.equal(true);
       });
-
+      it('should verify a valid request when "now" is a JS date instance',
+        async function() {
+          const now = new Date(Date.now());
+          const result = await verifyCapabilityInvocation({
+            url: invocationResourceUrl,
+            method,
+            suite,
+            headers: signed,
+            expectedHost,
+            getInvokedCapability,
+            documentLoader,
+            expectedTarget: invocationResourceUrl,
+            keyId,
+            now
+          });
+          should.exist(result);
+          result.should.be.an('object');
+          should.exist(result.verified);
+          result.verified.should.be.an('boolean');
+          result.verified.should.equal(true);
+        });
       it('should verify a valid request with multiple expectedHosts',
         async function() {
           const result = await verifyCapabilityInvocation({
