@@ -2,8 +2,8 @@
 
 ## 8.2.0 - 2021-08-TBD
 
-### Changed
-- Allow `now` to be passed as a JS date instance.
+### Added
+- Allow `now` to be passed as a JS Date instance.
 
 ## 8.1.1 - 2021-07-21
 
