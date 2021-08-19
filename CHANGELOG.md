@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 8.2.0 - 2021-08-TBD
+
+### Changed
+- Allow a JS date instance to be passed into `verifyCapabilityInvocation`.
+
 ## 8.1.1 - 2021-07-21
 
 ### Fixed

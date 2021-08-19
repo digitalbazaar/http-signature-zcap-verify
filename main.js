@@ -50,6 +50,9 @@ export async function verifyCapabilityInvocation({
   expectedAction, inspectCapabilityChain, suite, additionalHeaders = [],
   allowTargetAttenuation = false, now = Math.floor(Date.now() / 1000)
 }) {
+  if(now instanceof Date) {
+    now = Math.floor(now.getTime() / 1000);
+  }
   if(!getInvokedCapability) {
     throw new TypeError(
       '"getInvokedCapability" must be given to dereference the ' +
