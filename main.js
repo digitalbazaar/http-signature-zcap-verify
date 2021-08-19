@@ -40,7 +40,8 @@ cryptoLd.use(Ed25519VerificationKey2020);
  * @param {boolean} [options.allowTargetAttenuation=false] - Allow the
  *   invocationTarget of a delegation chain to be increasingly restrictive
  *   based on a hierarchical RESTful URL structure.
- * @param {integer} [options.now=now] - A unix time stamp.
+ * @param {integer|Date} [options.now=now] - A unix time stamp or an
+ *   instance of Date.
  *
  * @returns {Promise<object>} The result of the verification.
 */
