@@ -1,6 +1,6 @@
 # http-signature-zcap-verify ChangeLog
 
-## 8.2.0 - 2021-08-TBD
+## 8.2.0 - 2021-08-19
 
 ### Added
 - Allow `now` to be passed as a JS Date instance.
