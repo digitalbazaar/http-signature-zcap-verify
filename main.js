@@ -3,8 +3,8 @@
  */
 'use strict';
 
-import base64url from 'base64url-universal';
 import {base64Decode} from './util.js';
+import base64url from 'base64url-universal';
 import {CapabilityInvocation, constants} from '@digitalbazaar/zcapld';
 import pako from 'pako';
 import {parseRequest, parseSignatureHeader} from 'http-signature-header';
@@ -16,12 +16,11 @@ import {parseRequest, parseSignatureHeader} from 'http-signature-header';
  * @param {string} options.url - The url of the request.
  * @param {string} options.method - The HTTP request method.
  * @param {Array<string>} options.headers - The headers from the request.
- * @param {Function<Promise>} options.getInvokedCapability - An async
- *   function to call to dereference the invoked capability if it was passed
- *   by reference.
  * @param {Function<Promise>} options.getVerifier - An async function to
  *   call to get a verifier and verification method for the key ID.
- * @param {Function} options.documentLoader - A jsonld documentloader.
+ * @param {Function} options.documentLoader - A jsonld document loader; it
+ *   must be able to load the root zcap and any contexts used in the zcap
+ *   delegation chain.
  * @param {string} options.expectedHost - The expected host of the request.
  * @param {string} options.expectedAction - The expected action of the zcap.
  * @param {string} options.expectedRootCapability - The expected root
@@ -49,7 +48,7 @@ import {parseRequest, parseSignatureHeader} from 'http-signature-header';
  * @returns {Promise<object>} The result of the verification.
 */
 export async function verifyCapabilityInvocation({
-  url, method, headers, getInvokedCapability, getVerifier, documentLoader,
+  url, method, headers, getVerifier, documentLoader,
   expectedHost, expectedAction, expectedRootCapability, expectedTarget, suite,
   additionalHeaders = [], allowTargetAttenuation = false,
   inspectCapabilityChain, maxChainLength, maxDelegationTtl, maxTimestampDelta,
@@ -58,16 +57,10 @@ export async function verifyCapabilityInvocation({
   if(now instanceof Date) {
     now = Math.floor(now.getTime() / 1000);
   }
-  // FIXME: try to remove this param
-  if(!getInvokedCapability) {
-    throw new TypeError(
-      '"getInvokedCapability" must be given to dereference the ' +
-      'invoked capability.');
-  }
   if(!getVerifier) {
     throw new TypeError(
-      '"getVerifier" must be given to dereference keys for verifying ' +
-      'signatures.');
+      '"getVerifier" must be given to dereference the key for verifying ' +
+      'the capability invocation signature.');
   }
 
   // parse http header for signature
@@ -136,9 +129,7 @@ export async function verifyCapabilityInvocation({
   }
 
   let capability = parsedInvocationHeader.params.id;
-  if(capability) {
-    capability = await getInvokedCapability({id: capability, expectedTarget});
-  } else {
+  if(!capability) {
     capability = parsedInvocationHeader.params.capability;
     if(capability) {
       try {

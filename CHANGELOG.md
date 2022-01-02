@@ -21,6 +21,10 @@
   decoupled from this library and, as such, the crypto-ld and ed25519 libraries
   are no longer dependencies of this library.
 
+### Removed
+- **BREAKING**: The `getInvokedCapability` parameter has been removed as it is
+  no longer needed.
+
 ## 8.2.0 - 2021-08-19
 
 ### Added
