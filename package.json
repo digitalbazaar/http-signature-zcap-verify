@@ -20,7 +20,7 @@
     "util.js"
   ],
   "dependencies": {
-    "@digitalbazaar/zcapld": "^5.1.0",
+    "@digitalbazaar/zcapld": "digitalbazaar/zcapld#simplify-controller",
     "base64url-universal": "^1.0.0",
     "esm": "^3.2.22",
     "http-signature-header": "^2.0.1",
