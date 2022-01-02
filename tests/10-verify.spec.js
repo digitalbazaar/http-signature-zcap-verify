@@ -84,7 +84,16 @@ const setup = async ({Suite, type}) => {
     }
     return securityDocumentLoader(uri);
   };
+  // FIXME: attempt to remove `getInvokedCapability` entirely
   const getInvokedCapability = () => rootCapability;
+  const getVerifier = async ({keyId, documentLoader}) => {
+    // fromKeyId ensures that the key is valid and is not revoked
+    const key = await cryptoLd.fromKeyId({id: keyId, documentLoader});
+    const verificationMethod = await key.export(
+      {publicKey: true, includeContext: true});
+    const verifier = key.verifier();
+    return {verifier, verificationMethod};
+  };
   const created = Date.now() - 1000;
   // we need a signer just for the sign step
   const invocationSigner = keyPair.signer();
@@ -110,6 +119,7 @@ const setup = async ({Suite, type}) => {
     signed,
     documentLoader,
     getInvokedCapability,
+    getVerifier
   };
 };
 
@@ -117,12 +127,13 @@ describe('verifyCapabilityInvocation', function() {
   [Ed25519].forEach(function(suiteType) {
 
     describe(suiteType.type, function() {
-      let suite = null;
-      let documentLoader = null;
-      let keyId = null;
-      let getInvokedCapability = null;
-      let signed = null;
-      let expectedHost = null;
+      let suite;
+      let documentLoader;
+      let keyId;
+      let getInvokedCapability;
+      let getVerifier;
+      let signed;
+      let expectedHost;
 
       beforeEach(async function() {
         ({
@@ -131,6 +142,7 @@ describe('verifyCapabilityInvocation', function() {
           documentLoader,
           keyId,
           getInvokedCapability,
+          getVerifier,
           signed
         } = await setup(suiteType));
       });
@@ -143,6 +155,7 @@ describe('verifyCapabilityInvocation', function() {
           headers: signed,
           expectedHost,
           getInvokedCapability,
+          getVerifier,
           documentLoader,
           expectedTarget: invocationResourceUrl,
           keyId
@@ -163,6 +176,7 @@ describe('verifyCapabilityInvocation', function() {
             headers: signed,
             expectedHost,
             getInvokedCapability,
+            getVerifier,
             documentLoader,
             expectedTarget: invocationResourceUrl,
             keyId,
@@ -183,6 +197,7 @@ describe('verifyCapabilityInvocation', function() {
             headers: signed,
             expectedHost: [expectedHost, 'bar.org'],
             getInvokedCapability,
+            getVerifier,
             documentLoader,
             expectedTarget: invocationResourceUrl,
             keyId
@@ -219,6 +234,7 @@ describe('verifyCapabilityInvocation', function() {
               method,
               suite,
               getInvokedCapability,
+              getVerifier,
               documentLoader: _documentLoader,
               headers: signed,
               expectedHost,
@@ -265,6 +281,7 @@ describe('verifyCapabilityInvocation', function() {
             method,
             suite,
             getInvokedCapability,
+            getVerifier,
             headers: signed,
             expectedHost,
             expectedTarget: invocationResourceUrl,
@@ -287,6 +304,7 @@ describe('verifyCapabilityInvocation', function() {
             method,
             suite,
             getInvokedCapability,
+            getVerifier,
             documentLoader,
             expectedHost,
             expectedTarget: invocationResourceUrl,
@@ -314,6 +332,7 @@ describe('verifyCapabilityInvocation', function() {
             method,
             suite,
             getInvokedCapability,
+            getVerifier,
             documentLoader: _documentLoader,
             headers: signed,
             expectedHost,
@@ -354,6 +373,7 @@ describe('verifyCapabilityInvocation', function() {
               method,
               suite,
               getInvokedCapability,
+              getVerifier,
               documentLoader: _documentLoader,
               headers: signed,
               expectedHost,
@@ -380,6 +400,7 @@ describe('verifyCapabilityInvocation', function() {
               method,
               suite,
               getInvokedCapability,
+              getVerifier,
               documentLoader,
               headers: signed,
               expectedHost,
@@ -406,6 +427,7 @@ describe('verifyCapabilityInvocation', function() {
             method,
             suite,
             getInvokedCapability,
+            getVerifier,
             documentLoader,
             headers: signed,
             expectedHost,
@@ -433,6 +455,7 @@ describe('verifyCapabilityInvocation', function() {
             method,
             suite,
             getInvokedCapability,
+            getVerifier,
             documentLoader,
             headers: signed,
             expectedHost: 'not-foo.org',
@@ -467,6 +490,7 @@ describe('verifyCapabilityInvocation', function() {
             method,
             suite,
             getInvokedCapability,
+            getVerifier,
             documentLoader,
             headers: signed,
             expectedHost,
@@ -500,6 +524,7 @@ describe('verifyCapabilityInvocation', function() {
               method,
               suite,
               getInvokedCapability,
+              getVerifier,
               documentLoader,
               headers: signed,
               expectedHost,
@@ -533,6 +558,7 @@ describe('verifyCapabilityInvocation', function() {
               method,
               suite,
               getInvokedCapability,
+              getVerifier,
               documentLoader,
               headers: signed,
               expectedHost,
@@ -560,6 +586,7 @@ describe('verifyCapabilityInvocation', function() {
               url: invocationResourceUrl,
               suite,
               getInvokedCapability,
+              getVerifier,
               documentLoader,
               headers: signed,
               expectedHost,
@@ -588,6 +615,7 @@ describe('verifyCapabilityInvocation', function() {
             method,
             suite,
             getInvokedCapability,
+            getVerifier,
             documentLoader,
             headers: signed,
             expectedHost,
@@ -618,6 +646,7 @@ describe('verifyCapabilityInvocation', function() {
               method,
               suite,
               getInvokedCapability,
+              getVerifier,
               documentLoader,
               headers: signed,
               expectedHost,
@@ -647,6 +676,7 @@ describe('verifyCapabilityInvocation', function() {
               method,
               suite,
               getInvokedCapability,
+              getVerifier,
               documentLoader,
               headers: signed,
               expectedHost,
