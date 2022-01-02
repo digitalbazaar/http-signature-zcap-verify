@@ -147,7 +147,7 @@ describe('verifyCapabilityInvocation', function() {
         } = await setup(suiteType));
       });
 
-      it.only('should verify a valid request', async function() {
+      it('should verify a valid request', async function() {
         const result = await verifyCapabilityInvocation({
           url: invocationResourceUrl,
           method,
