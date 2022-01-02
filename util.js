@@ -1,10 +1,6 @@
-// Node.js TextDecoder/TextEncoder
-export {TextDecoder, TextEncoder} from 'util';
-
-export function base64Encode(data) {
-  return Buffer.from(data, data.offset, data.length).toString('base64');
-}
-
+/*!
+ * Copyright (c) 2021-2022 Digital Bazaar, Inc. All rights reserved.
+ */
 export function base64Decode(str) {
   return Buffer.from(str, 'base64');
 }

@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2020-2021 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2020-2022 Digital Bazaar, Inc. All rights reserved.
  */
 import {securityLoader} from '@digitalbazaar/security-document-loader';
 import aesContext from 'aes-key-wrapping-2019-context';
