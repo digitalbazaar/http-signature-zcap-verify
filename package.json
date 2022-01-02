@@ -89,7 +89,6 @@
   "homepage": "https://github.com/digitalbazaar/http-signature-zcap-verify",
   "module": "main.js",
   "browser": {
-    "./crypto.js": "./crypto-browser.js",
     "./util.js": "./util-browser.js"
   },
   "engines": {

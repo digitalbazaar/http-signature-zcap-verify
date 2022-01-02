@@ -1,14 +1,14 @@
 /*!
- * Copyright (c) 2020-2021 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2020-2022 Digital Bazaar, Inc. All rights reserved.
  */
 import {verifyCapabilityInvocation} from '..';
-import {signCapabilityInvocation} from 'http-signature-zcap-invoke';
 import {Ed25519VerificationKey2020} from
   '@digitalbazaar/ed25519-verification-key-2020';
 import {Ed25519Signature2020} from '@digitalbazaar/ed25519-signature-2020';
 import {CryptoLD} from 'crypto-ld';
-import zcapCtx from 'zcap-context';
 import {securityDocumentLoader} from './document-loader.js';
+import {signCapabilityInvocation} from 'http-signature-zcap-invoke';
+import zcapCtx from 'zcap-context';
 
 const controller = 'did:test:controller';
 

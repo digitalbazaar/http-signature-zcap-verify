@@ -4,10 +4,10 @@
 'use strict';
 
 import base64url from 'base64url-universal';
+import {base64Decode} from './util.js';
+import {CapabilityInvocation, constants} from '@digitalbazaar/zcapld';
 import pako from 'pako';
 import {parseRequest, parseSignatureHeader} from 'http-signature-header';
-import {CapabilityInvocation, constants} from '@digitalbazaar/zcapld';
-import {TextDecoder, TextEncoder, base64Decode} from './util.js';
 
 /**
  * Verifies a zcap invocation in the form of an http-signature header.
