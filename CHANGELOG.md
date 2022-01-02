@@ -1,5 +1,26 @@
 # http-signature-zcap-verify ChangeLog
 
+## 9.0.0 - 2022-01-xx
+
+### Added
+- Add optional parameters `maxChainLength`, `maxDelegationTtl`, and
+  `maxTimestampDelta` to allow for more fine grained control. These parameters
+  all have defaults in zcapld that could previously not be set to other
+  values at this layer.
+
+### Changed
+- **BREAKING**: A new function parameter `getVerifier` must now be passed. This
+  function will be given the `keyId` for the key to be used to verify a
+  signature and the `documentLoader` passed to `verifyCapabilityInvocation`. It
+  must return a `verifier` and a `verificationMethod`. The `verifier` object
+  must have a `verify` function that can be called with `data` and a
+  `signature` and that returns a boolean. The `verificationMethod` object
+  must include a verification method expressing the key information. The
+  `getVerifier` function may throw an exception if the key is revoked. This
+  new `getVerifier` function allows specific cryptographic suites to be
+  decoupled from this library and, as such, the crypto-ld and ed25519 libraries
+  are no longer dependencies of this library.
+
 ## 8.2.0 - 2021-08-19
 
 ### Added

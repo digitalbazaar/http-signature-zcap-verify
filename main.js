@@ -1,19 +1,13 @@
 /*!
- * Copyright (c) 2021 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Digital Bazaar, Inc. All rights reserved.
  */
 'use strict';
 
 import base64url from 'base64url-universal';
 import pako from 'pako';
-import {CryptoLD} from 'crypto-ld';
 import {parseRequest, parseSignatureHeader} from 'http-signature-header';
 import {CapabilityInvocation, constants} from '@digitalbazaar/zcapld';
 import {TextDecoder, TextEncoder, base64Decode} from './util.js';
-import {Ed25519VerificationKey2020} from
-  '@digitalbazaar/ed25519-verification-key-2020';
-
-const cryptoLd = new CryptoLD();
-cryptoLd.use(Ed25519VerificationKey2020);
 
 /**
  * Verifies a zcap invocation in the form of an http-signature header.
@@ -25,39 +19,55 @@ cryptoLd.use(Ed25519VerificationKey2020);
  * @param {Function<Promise>} options.getInvokedCapability - An async
  *   function to call to dereference the invoked capability if it was passed
  *   by reference.
+ * @param {Function<Promise>} options.getVerifier - An async function to
+ *   call to get a verifier and verification method for the key ID.
  * @param {Function} options.documentLoader - A jsonld documentloader.
  * @param {string} options.expectedHost - The expected host of the request.
+ * @param {string} options.expectedAction - The expected action of the zcap.
+ * @param {string} options.expectedRootCapability - The expected root
+ *   capability of the zcap.
  * @param {string} options.expectedTarget - The expected target of the zcap.
- * @param {string} options.expectedRootCapability - The expected root capability
- *   of the zcap.
- * @param {string} options.expectedAction - The expected allowed action of the
- *  zcap.
- * @param {Function} options.inspectCapabilityChain - A function that can
- *   inspect a capability chain.
- * @param {object} options.suite - A jsigs signature suite.
- * @param {Array<string>} [options.additionalHeaders=[]] - Additional headers
- *  to verify.
+ * @param {object} options.suite - The jsigs signature suite(s) for verifying
+ *   the capability delegation chain.
  * @param {boolean} [options.allowTargetAttenuation=false] - Allow the
  *   invocationTarget of a delegation chain to be increasingly restrictive
  *   based on a hierarchical RESTful URL structure.
- * @param {integer|Date} [options.now=now] - A unix time stamp or an
+ * @param {Array<string>} [options.additionalHeaders=[]] - Additional headers
+ *  to verify.
+ * @param {Function} [options.inspectCapabilityChain] - A function that can
+ *   inspect a capability chain.
+ * @param {number} [options.maxChainLength] - The maximum length of the
+ *   capability delegation chain.
+ * @param {number} [options.maxDelegationTtl] - The maximum milliseconds to
+ *   live for a delegated zcap as measured by the time difference between
+ *   `expires` and `created` on the delegation proof.
+ * @param {number} [options.maxTimestampDelta] - A maximum number of seconds
+ *   that the date on the signature can deviate from, defaults to `Infinity`.
+ * @param {integer|Date} [options.now=now] - A unix timestamp or an
  *   instance of Date.
  *
  * @returns {Promise<object>} The result of the verification.
 */
 export async function verifyCapabilityInvocation({
-  url, method, headers, getInvokedCapability, documentLoader,
-  expectedHost, expectedTarget, expectedRootCapability,
-  expectedAction, inspectCapabilityChain, suite, additionalHeaders = [],
-  allowTargetAttenuation = false, now = Math.floor(Date.now() / 1000)
+  url, method, headers, getInvokedCapability, getVerifier, documentLoader,
+  expectedHost, expectedAction, expectedRootCapability, expectedTarget, suite,
+  additionalHeaders = [], allowTargetAttenuation = false,
+  inspectCapabilityChain, maxChainLength, maxDelegationTtl, maxTimestampDelta,
+  now = Math.floor(Date.now() / 1000)
 }) {
   if(now instanceof Date) {
     now = Math.floor(now.getTime() / 1000);
   }
+  // FIXME: try to remove this param
   if(!getInvokedCapability) {
     throw new TypeError(
       '"getInvokedCapability" must be given to dereference the ' +
       'invoked capability.');
+  }
+  if(!getVerifier) {
+    throw new TypeError(
+      '"getVerifier" must be given to dereference keys for verifying ' +
+      'signatures.');
   }
 
   // parse http header for signature
@@ -101,13 +111,9 @@ export async function verifyCapabilityInvocation({
   // get parsed parameters from from HTTP header and generate signing string
   const {keyId, signingString, params: {signature: b64Signature}} = parsed;
 
-  // fromKeyId ensures that the key is valid and is not revoked
-  const key = await cryptoLd.fromKeyId({id: keyId, documentLoader});
-  const verificationMethod = await key.export(
-    {publicKey: true, includeContext: true});
-
   // verify HTTP signature
-  const verifier = key.verifier();
+  const {verifier, verificationMethod} = await getVerifier(
+    {keyId, documentLoader});
   const encoder = new TextEncoder();
   const data = encoder.encode(signingString);
   const signature = base64Decode(b64Signature);
@@ -157,10 +163,14 @@ export async function verifyCapabilityInvocation({
   // check capability invocation
   const purpose = new CapabilityInvocation({
     allowTargetAttenuation,
-    expectedTarget,
-    expectedRootCapability,
+    date: now,
     expectedAction,
+    expectedRootCapability,
+    expectedTarget,
     inspectCapabilityChain,
+    maxChainLength,
+    maxDelegationTtl,
+    maxTimestampDelta,
     suite
   });
   const capabilityAction = parsedInvocationHeader.params.action;
@@ -168,6 +178,7 @@ export async function verifyCapabilityInvocation({
     '@context': constants.ZCAP_CONTEXT_URL,
     capability,
     capabilityAction,
+    invocationTarget: url,
     verificationMethod: keyId
   };
   const {valid, error} = await purpose.validate(proof, {
@@ -178,9 +189,11 @@ export async function verifyCapabilityInvocation({
     return {verified: false, error};
   }
 
+  const controller = verificationMethod.controller || verificationMethod.id;
   return {
     verified: true,
-    invoker: key.controller || key.id,
+    controller,
+    invoker: controller,
     capability,
     capabilityAction,
     verificationMethod
