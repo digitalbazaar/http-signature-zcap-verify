@@ -180,7 +180,7 @@ export async function verifyCapabilityInvocation({
   if(url.includes(':')) {
     invocationTarget = url;
   } else {
-    invocationTarget = `${headers.host}${url}`;
+    invocationTarget = `https://${headers.host}${url}`;
   }
   const capabilityAction = parsedInvocationHeader.params.action;
   const proof = {
