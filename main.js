@@ -40,8 +40,9 @@ import {parseRequest, parseSignatureHeader} from 'http-signature-header';
  * @param {number} [options.maxDelegationTtl] - The maximum milliseconds to
  *   live for a delegated zcap as measured by the time difference between
  *   `expires` and `created` on the delegation proof.
- * @param {number} [options.maxTimestampDelta] - A maximum number of seconds
- *   that the date on the signature can deviate from, defaults to `Infinity`.
+ * @param {number} [maxTimestampDelta=Infinity] - A maximum number of seconds
+ *   that the date on the capability invocation proof can deviate from
+ *   `date`, defaults to `Infinity`.
  * @param {integer|Date} [options.now=now] - A unix timestamp or an
  *   instance of Date.
  *
@@ -76,8 +77,14 @@ export async function verifyCapabilityInvocation({
   expectedHeaders.push(...additionalHeaders);
   let parsed;
   try {
-    parsed = parseRequest(
-      {url, method, headers}, {headers: expectedHeaders, now});
+    // `now` will be used to check against the expiry on the signature using
+    // a clock skew of 5 minutes
+    parsed = parseRequest({url, method, headers}, {
+      headers: expectedHeaders,
+      // 300 seconds = 5 minutes
+      clockSkew: 300,
+      now
+    });
   } catch(error) {
     return {verified: false, error};
   }
@@ -102,7 +109,10 @@ export async function verifyCapabilityInvocation({
   capability identifiers are infeasible to guess. */
 
   // get parsed parameters from from HTTP header and generate signing string
-  const {keyId, signingString, params: {signature: b64Signature}} = parsed;
+  const {
+    keyId, signingString,
+    params: {created, signature: b64Signature}
+  } = parsed;
 
   // verify HTTP signature
   const {verifier, verificationMethod} = await getVerifier(
@@ -169,6 +179,8 @@ export async function verifyCapabilityInvocation({
     '@context': constants.ZCAP_CONTEXT_URL,
     capability,
     capabilityAction,
+    // use second precision for created date
+    created: new Date(created * 1000).toISOString().slice(0, -5) + 'Z',
     invocationTarget: url,
     verificationMethod: keyId
   };
