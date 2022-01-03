@@ -3,10 +3,10 @@
 ## 9.0.0 - 2022-01-xx
 
 ### Added
-- Add optional parameters `maxChainLength`, `maxDelegationTtl`, and
-  `maxTimestampDelta` to allow for more fine grained control. These parameters
-  all have defaults in zcapld that could previously not be set to other
-  values at this layer.
+- Add optional parameters `maxChainLength`, `maxClockSkew`, and
+  `maxDelegationTtl` to allow for more fine grained control. These
+  parameters all have defaults in zcapld that could previously not be set to
+  other values at this layer.
 
 ### Changed
 - **BREAKING**: A new function parameter `getVerifier` must now be passed. This

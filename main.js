@@ -40,9 +40,11 @@ import {parseRequest, parseSignatureHeader} from 'http-signature-header';
  * @param {number} [options.maxDelegationTtl] - The maximum milliseconds to
  *   live for a delegated zcap as measured by the time difference between
  *   `expires` and `created` on the delegation proof.
- * @param {number} [maxTimestampDelta=Infinity] - A maximum number of seconds
- *   that the date on the capability invocation proof can deviate from
- *   `date`, defaults to `Infinity`.
+ * @param {number} [options.maxClockSkew=300] - A maximum number of seconds
+ *   that clocks may be skewed when checking capability expiration date-times
+ *   against `date`, when comparing invocation proof creation time against
+ *   delegation proof creation time, and when comparing the capability
+ *   invocation expiration time against `now`.
  * @param {integer|Date} [options.now=now] - A unix timestamp or an
  *   instance of Date.
  *
@@ -52,7 +54,7 @@ export async function verifyCapabilityInvocation({
   url, method, headers, getVerifier, documentLoader,
   expectedHost, expectedAction, expectedRootCapability, expectedTarget, suite,
   additionalHeaders = [], allowTargetAttenuation = false,
-  inspectCapabilityChain, maxChainLength, maxDelegationTtl, maxTimestampDelta,
+  inspectCapabilityChain, maxChainLength, maxClockSkew = 300, maxDelegationTtl,
   now = Math.floor(Date.now() / 1000)
 }) {
   if(now instanceof Date) {
@@ -81,8 +83,7 @@ export async function verifyCapabilityInvocation({
     // a clock skew of 5 minutes
     parsed = parseRequest({url, method, headers}, {
       headers: expectedHeaders,
-      // 300 seconds = 5 minutes
-      clockSkew: 300,
+      clockSkew: maxClockSkew,
       now
     });
   } catch(error) {
@@ -170,8 +171,8 @@ export async function verifyCapabilityInvocation({
     expectedTarget,
     inspectCapabilityChain,
     maxChainLength,
+    maxClockSkew,
     maxDelegationTtl,
-    maxTimestampDelta,
     suite
   });
   const capabilityAction = parsedInvocationHeader.params.action;
