@@ -175,6 +175,13 @@ export async function verifyCapabilityInvocation({
     maxDelegationTtl,
     suite
   });
+  // invocation target must match absolute url
+  let invocationTarget;
+  if(url.includes(':')) {
+    invocationTarget = url;
+  } else {
+    invocationTarget = `${headers.host}/${url}`;
+  }
   const capabilityAction = parsedInvocationHeader.params.action;
   const proof = {
     '@context': constants.ZCAP_CONTEXT_URL,
@@ -182,7 +189,7 @@ export async function verifyCapabilityInvocation({
     capabilityAction,
     // use second precision for created date
     created: new Date(created * 1000).toISOString().slice(0, -5) + 'Z',
-    invocationTarget: url,
+    invocationTarget,
     verificationMethod: keyId
   };
   const {valid, error} = await purpose.validate(proof, {
