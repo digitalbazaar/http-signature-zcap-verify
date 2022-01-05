@@ -154,6 +154,12 @@ export async function verifyCapabilityInvocation({
         return {verified: false, error};
       }
     }
+    if(!capability.parentCapability) {
+      const error = new Error(
+        'A root capability must be invoked using only its ID.');
+      error.name = 'DataError';
+      return {verified: false, error};
+    }
   }
   if(!capability) {
     const error = new Error(
