@@ -171,7 +171,8 @@ export async function verifyCapabilityInvocation({
   // check capability invocation
   const purpose = new CapabilityInvocation({
     allowTargetAttenuation,
-    date: now,
+    // `date` is in milliseconds and `now` is in seconds, so convert
+    date: now * 1000,
     expectedAction,
     expectedRootCapability,
     expectedTarget,
