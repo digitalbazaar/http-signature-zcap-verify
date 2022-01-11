@@ -44,7 +44,7 @@
     "crypto-ld": "^6.0.0",
     "eslint": "^8.6.0",
     "eslint-config-digitalbazaar": "^2.6.1",
-    "http-signature-zcap-invoke": "digitalbazaar/http-signature-zcap-invoke#zcapld-update",
+    "http-signature-zcap-invoke": "^4.0.0",
     "karma": "^6.1.1",
     "karma-babel-preprocessor": "^8.0.0",
     "karma-chai": "^0.1.0",
