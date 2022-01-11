@@ -1,7 +1,7 @@
 /*!
  * Copyright (c) 2020-2022 Digital Bazaar, Inc. All rights reserved.
  */
-import {createRootCapability} from '@digitalbazaar/zcapld';
+import {createRootCapability} from '@digitalbazaar/zcap';
 import {verifyCapabilityInvocation} from '..';
 import {Ed25519VerificationKey2020} from
   '@digitalbazaar/ed25519-verification-key-2020';

@@ -5,7 +5,7 @@
 
 import {base64Decode} from './util.js';
 import base64url from 'base64url-universal';
-import {CapabilityInvocation, constants} from '@digitalbazaar/zcapld';
+import {CapabilityInvocation, constants} from '@digitalbazaar/zcap';
 import pako from 'pako';
 import {parseRequest, parseSignatureHeader} from 'http-signature-header';
 
