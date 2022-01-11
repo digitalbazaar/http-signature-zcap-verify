@@ -1,5 +1,10 @@
 # http-signature-zcap-verify ChangeLog
 
+## 9.0.1 - 2022-01-11
+
+### Fixed
+- Use http-signature-zcap-invoke@4 dev dependency.
+
 ## 9.0.0 - 2022-01-11
 
 ### Added
