@@ -1,4 +1,10 @@
-# http-signature-zcap-verify ChangeLog
+# @digitalbazaar/http-signature-zcap-verify ChangeLog
+
+## 10.0.0 - 2022-01-xx
+
+### Changed
+- **BREAKING**: Renamed package to `@digitalbazaar/http-signature-zcap-verify`.
+- Updated dependencies.
 
 ## 9.0.1 - 2022-01-11
 

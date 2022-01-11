@@ -8,7 +8,8 @@ import {Ed25519VerificationKey2020} from
 import {Ed25519Signature2020} from '@digitalbazaar/ed25519-signature-2020';
 import {CryptoLD} from 'crypto-ld';
 import {securityDocumentLoader} from './document-loader.js';
-import {signCapabilityInvocation} from 'http-signature-zcap-invoke';
+import {signCapabilityInvocation} from
+  '@digitalbazaar/http-signature-zcap-invoke';
 import zcapCtx from 'zcap-context';
 
 const controller = 'did:test:controller';

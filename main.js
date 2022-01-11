@@ -7,7 +7,9 @@ import {base64Decode} from './util.js';
 import base64url from 'base64url-universal';
 import {CapabilityInvocation, constants} from '@digitalbazaar/zcap';
 import pako from 'pako';
-import {parseRequest, parseSignatureHeader} from 'http-signature-header';
+import {
+  parseRequest, parseSignatureHeader
+} from '@digitalbazaar/http-signature-header';
 
 /**
  * Verifies a zcap invocation in the form of an http-signature header.
