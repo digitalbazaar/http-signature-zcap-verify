@@ -1,6 +1,6 @@
 # http-signature-zcap-verify ChangeLog
 
-## 9.0.0 - 2022-01-xx
+## 9.0.0 - 2022-01-11
 
 ### Added
 - Add optional parameters `maxChainLength`, `maxClockSkew`, and
