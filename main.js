@@ -201,22 +201,24 @@ export async function verifyCapabilityInvocation({
     invocationTarget,
     verificationMethod: keyId
   };
-  const {valid, error} = await purpose.validate(proof, {
+  const result = await purpose.validate(proof, {
     verificationMethod,
     documentLoader
   });
+  const {valid, error, dereferencedChain} = result;
   if(!valid) {
     return {verified: false, error};
   }
 
   const controller = verificationMethod.controller || verificationMethod.id;
   return {
-    verified: true,
-    controller,
-    invoker: controller,
     capability,
     capabilityAction,
-    verificationMethod
+    controller,
+    dereferencedChain,
+    invoker: controller,
+    verificationMethod,
+    verified: true
   };
 }
 

@@ -1,5 +1,10 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
+## 10.1.0 - 2022-01-xx
+
+### Added
+- Use zcap@7.1 to include `dereferencedChain` in verification results.
+
 ## 10.0.0 - 2022-01-11
 
 ### Changed
