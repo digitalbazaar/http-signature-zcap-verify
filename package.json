@@ -5,6 +5,12 @@
   "license": "BSD-3-Clause",
   "type": "module",
   "exports": "./lib/index.js",
+  "browser": {
+    "./lib/util.js": "./lib/util-browser.js"
+  },
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "test": "npm run test-node",
     "test-node": "cross-env NODE_ENV=test mocha --preserve-symlinks -t 30000 -A -R ${REPORTER:-spec} --require tests/test-mocha.js tests/*.spec.js",
@@ -14,9 +20,6 @@
     "coverage-report": "c8 report",
     "lint": "eslint ."
   },
-  "files": [
-    "lib/"
-  ],
   "dependencies": {
     "@digitalbazaar/http-signature-header": "^5.0.0",
     "@digitalbazaar/zcap": "^8.0.0",
@@ -75,10 +78,6 @@
     "url": "https://github.com/digitalbazaar/http-signature-zcap-verify/issues"
   },
   "homepage": "https://github.com/digitalbazaar/http-signature-zcap-verify",
-  "module": "main.js",
-  "browser": {
-    "./util.js": "./util-browser.js"
-  },
   "engines": {
     "node": ">=14"
   },
