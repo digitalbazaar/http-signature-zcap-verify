@@ -2,7 +2,7 @@
  * Copyright (c) 2020-2022 Digital Bazaar, Inc. All rights reserved.
  */
 import {createRootCapability} from '@digitalbazaar/zcap';
-import {verifyCapabilityInvocation} from '..';
+import {verifyCapabilityInvocation} from '../lib/index.js';
 import {Ed25519VerificationKey2020} from
   '@digitalbazaar/ed25519-verification-key-2020';
 import {Ed25519Signature2020} from '@digitalbazaar/ed25519-signature-2020';
