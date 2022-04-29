@@ -1,5 +1,14 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
+## 11.0.0 - 2022-xx-xx
+
+### Changed
+- **BREAKING**: Convert to module (ESM).
+- **BREAKING**: Require Node.js >=14.
+- Update dependencies.
+- Remove unused dependencies.
+- Lint module.
+
 ## 10.2.0 - 2022-05-12
 
 ### Added
