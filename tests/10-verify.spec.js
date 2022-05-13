@@ -168,6 +168,36 @@ describe('verifyCapabilityInvocation', function() {
         result.verified.should.be.an('boolean');
         result.verified.should.equal(true);
       });
+      it('should call `beforeValidatePurpose` handler', async function() {
+        let called = 0;
+        let params;
+        const result = await verifyCapabilityInvocation({
+          url: invocationResourceUrl,
+          method,
+          suite,
+          headers: signed,
+          expectedHost,
+          expectedAction,
+          expectedRootCapability,
+          getVerifier,
+          documentLoader,
+          expectedTarget: invocationResourceUrl,
+          keyId,
+          beforeValidatePurpose(_params) {
+            called += 1;
+            params = _params;
+          }
+        });
+        should.exist(result);
+        result.should.be.an('object');
+        should.exist(result.verified);
+        result.verified.should.be.an('boolean');
+        result.verified.should.equal(true);
+        called.should.equal(1);
+        params.should.include.keys([
+          'capability', 'capabilityAction', 'purpose', 'proof'
+        ]);
+      });
       it('should verify a valid request when "now" is a JS date instance',
         async function() {
           const now = new Date(Date.now());

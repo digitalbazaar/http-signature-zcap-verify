@@ -1,5 +1,15 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
+## 10.2.0 - 2022-05-xx
+
+### Added
+- Add optional `beforeValidatePurpose` method for inspecting the proof purpose,
+  proof meta data, and capability information prior to purpose validation. This
+  function can be useful for handling situations where the root controller for
+  the target object may be cached and could have changed -- and the information
+  passed could help an application determine whether or not it should check for
+  a more fresh root controller.
+
 ## 10.1.0 - 2022-01-14
 
 ### Added

@@ -34,7 +34,10 @@ import {
  *   invocationTarget of a delegation chain to be increasingly restrictive
  *   based on a hierarchical RESTful URL structure.
  * @param {Array<string>} [options.additionalHeaders=[]] - Additional headers
- *  to verify.
+ *   to verify.
+ * @param {Function} [options.beforeValidatePurpose] - A function that is
+ *   called prior to validating the proof purpose and is passed the purpose
+ *   instance, proof meta data, and capability information.
  * @param {Function} [options.inspectCapabilityChain] - A function that can
  *   inspect a capability chain.
  * @param {number} [options.maxChainLength] - The maximum length of the
@@ -56,6 +59,7 @@ export async function verifyCapabilityInvocation({
   url, method, headers, getVerifier, documentLoader,
   expectedHost, expectedAction, expectedRootCapability, expectedTarget, suite,
   additionalHeaders = [], allowTargetAttenuation = false,
+  beforeValidatePurpose,
   inspectCapabilityChain, maxChainLength, maxClockSkew = 300, maxDelegationTtl,
   now = Math.floor(Date.now() / 1000)
 }) {
@@ -66,6 +70,9 @@ export async function verifyCapabilityInvocation({
     throw new TypeError(
       '"getVerifier" must be given to dereference the key for verifying ' +
       'the capability invocation signature.');
+  }
+  if(beforeValidatePurpose && typeof beforeValidatePurpose !== 'function') {
+    throw new TypeError('"beforeValidatePurpose" must be a function.');
   }
 
   // parse http header for signature
@@ -201,6 +208,11 @@ export async function verifyCapabilityInvocation({
     invocationTarget,
     verificationMethod: keyId
   };
+  if(beforeValidatePurpose) {
+    await beforeValidatePurpose({
+      purpose, proof, capability, capabilityAction
+    });
+  }
   const result = await purpose.validate(proof, {
     verificationMethod,
     documentLoader
