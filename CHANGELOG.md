@@ -1,6 +1,6 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
-## 10.2.0 - 2022-05-xx
+## 10.2.0 - 2022-05-12
 
 ### Added
 - Add optional `beforeValidatePurpose` method for inspecting the proof purpose,
