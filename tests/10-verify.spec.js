@@ -30,7 +30,8 @@ let keyPair;
 const setup = async ({Suite, type}) => {
   let expectedHost = 'test.org';
   if(typeof window !== 'undefined') {
-    expectedHost = window.location.host; // eslint-disable-line no-undef
+    // eslint-disable-next-line no-undef
+    expectedHost = window.location.host;
   }
   // the tests will use a mock didKey.
   keyPair = await cryptoLd.generate({
