@@ -1,5 +1,17 @@
-# http-signature-zcap-verify
-A library for verifying Authorization Capability (ZCAP) invocations via HTTP signatures
+# http-signature-zcap-verify _(@digitalbazaar/http-signature-zcap-verify)_
+
+A library for verifying Authorization Capability (ZCAP) invocations via HTTP
+signatures
+
+## Install
+
+- Browsers and Node.js 14+ are supported.
+
+To install from NPM:
+
+```
+npm install @digitalbazaar/http-signature-zcap-verify
+```
 
 ## Example "getVerifier" for "verifyCapabilityInvocation"
 
