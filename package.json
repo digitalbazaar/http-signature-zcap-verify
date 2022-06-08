@@ -1,6 +1,6 @@
 {
   "name": "@digitalbazaar/http-signature-zcap-verify",
-  "version": "10.2.1-0",
+  "version": "11.0.0",
   "description": "A library for invoking Authorization Capabilities via HTTP signatures",
   "license": "BSD-3-Clause",
   "type": "module",
