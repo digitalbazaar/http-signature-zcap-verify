@@ -1,10 +1,10 @@
 /*!
  * Copyright (c) 2020-2022 Digital Bazaar, Inc. All rights reserved.
  */
-import {securityLoader} from '@digitalbazaar/security-document-loader';
 import aesContext from 'aes-key-wrapping-2019-context';
 import hmacContext from 'sha256-hmac-key-2019-context';
 import secCtx from '@digitalbazaar/security-context';
+import {securityLoader} from '@digitalbazaar/security-document-loader';
 import zcapCtx from 'zcap-context';
 
 const loader = securityLoader();
