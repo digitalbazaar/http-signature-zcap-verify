@@ -1,5 +1,11 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
+## 11.1.0 - 2022-11-13
+
+### Changed
+- Update dependencies:
+  - Use `@digitalbazaar/zcap@9`.
+
 ## 11.0.0 - 2022-06-07
 
 ### Changed
