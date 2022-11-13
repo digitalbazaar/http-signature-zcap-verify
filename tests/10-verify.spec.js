@@ -2,14 +2,14 @@
  * Copyright (c) 2020-2022 Digital Bazaar, Inc. All rights reserved.
  */
 import {createRootCapability} from '@digitalbazaar/zcap';
-import {verifyCapabilityInvocation} from '../lib/index.js';
+import {CryptoLD} from 'crypto-ld';
+import {Ed25519Signature2020} from '@digitalbazaar/ed25519-signature-2020';
 import {Ed25519VerificationKey2020} from
   '@digitalbazaar/ed25519-verification-key-2020';
-import {Ed25519Signature2020} from '@digitalbazaar/ed25519-signature-2020';
-import {CryptoLD} from 'crypto-ld';
 import {securityDocumentLoader} from './document-loader.js';
 import {signCapabilityInvocation} from
   '@digitalbazaar/http-signature-zcap-invoke';
+import {verifyCapabilityInvocation} from '../lib/index.js';
 import zcapCtx from 'zcap-context';
 
 const controller = 'did:test:controller';
