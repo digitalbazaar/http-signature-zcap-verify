@@ -22,12 +22,12 @@
   },
   "dependencies": {
     "@digitalbazaar/http-signature-header": "^5.0.0",
-    "@digitalbazaar/zcap": "^8.0.0",
+    "@digitalbazaar/zcap": "^9.0.0",
     "base64url-universal": "^2.0.0",
     "pako": "^2.0.4"
   },
   "devDependencies": {
-    "@digitalbazaar/ed25519-signature-2020": "^4.0.1",
+    "@digitalbazaar/ed25519-signature-2020": "^5.0.0",
     "@digitalbazaar/ed25519-verification-key-2020": "^4.0.0",
     "@digitalbazaar/http-signature-zcap-invoke": "^6.0.0",
     "@digitalbazaar/security-context": "^1.0.0",
@@ -38,9 +38,9 @@
     "cross-env": "^7.0.3",
     "crypto-ld": "^7.0.0",
     "eslint": "^8.17.0",
-    "eslint-config-digitalbazaar": "^3.0.0",
+    "eslint-config-digitalbazaar": "^4.1.0",
     "eslint-plugin-jsdoc": "^39.3.2",
-    "eslint-plugin-unicorn": "^42.0.0",
+    "eslint-plugin-unicorn": "^44.0.2",
     "isomorphic-webcrypto": "^2.3.8",
     "karma": "^6.3.20",
     "karma-chai": "^0.1.0",
