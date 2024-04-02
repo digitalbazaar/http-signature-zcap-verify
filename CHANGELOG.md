@@ -1,5 +1,11 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
+## 11.1.1 - 2024-04-xx
+
+### Fixed
+- Fixed an issue where verification would fail if the url used to create the
+  `invocationTarget` when checking the proof contains a colon.
+
 ## 11.1.0 - 2022-11-13
 
 ### Changed
