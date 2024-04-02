@@ -1,10 +1,14 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
-## 11.1.1 - 2024-04-xx
+## 11.1.1 - 2024-04-dd
 
 ### Fixed
-- Fixed an issue where verification would fail if the url used to create the
-  `invocationTarget` when checking the proof contains a colon.
+- Fixed an issue where verification would fail if a relative url
+  containing an unencoded colon was passed to create the
+  `invocationTarget`. This allows URLs with colons that are not
+  properly encoded (failing to encode colons is bad practice
+  and non-conformant) because they are still often allowed in
+  applications.
 
 ## 11.1.0 - 2022-11-13
 
