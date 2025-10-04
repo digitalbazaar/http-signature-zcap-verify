@@ -27,8 +27,9 @@ const method = 'GET';
 
 let keyPair;
 
-const setup = async ({Suite, type}) => {
-  let expectedHost = 'test.org';
+const setup = async ({Suite, type, invocationTarget = invocationResourceUrl}) => {
+  const invocationResourceUrl = invocationTarget
+  let expectedHost = new URL(invocationTarget).host
   if(typeof window !== 'undefined') {
     // eslint-disable-next-line no-undef
     expectedHost = window.location.host;
@@ -747,6 +748,33 @@ describe('verifyCapabilityInvocation', function() {
           result.error.message.should.equal(
             'capability-invocation was not in the request');
         });
+
+      // Each of these URIs will be invoked, resulting in an invocation
+      // we'll expect to be verifiable.
+      // Verifiers may be picky or have edge cases around:
+      // * uri schemes e.g. http vs https vs urn
+      // * special case hostnames like 'localhost'
+      // * port numbers
+      const allowedInvocationTargets = [
+      `http://localhost:8080`,
+      `http://localhost`,
+      `https://localhost`,
+      `https://test.org/foo/bar`,
+      ]
+      for (const invocationTarget of allowedInvocationTargets) {
+        it(`verifies zcaps with invocationTarget=${invocationTarget}`, async () => {
+          const context = await setup({...suiteType, invocationTarget})
+          const result = await verifyCapabilityInvocation({
+            method: 'GET',
+            ...context,
+            url: invocationTarget,
+            expectedTarget: invocationTarget,
+            headers: context.signed,
+          });
+          if (result.error) throw result.error
+          should.equal(result.verified, true, `zcap should be verified`)
+        })
+      }
     });
   });
 });
