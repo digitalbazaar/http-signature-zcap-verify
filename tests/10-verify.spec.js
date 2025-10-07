@@ -28,8 +28,8 @@ const method = 'GET';
 let keyPair;
 
 const setup = async ({Suite, type, invocationTarget = invocationResourceUrl}) => {
-  const invocationResourceUrl = invocationTarget
-  let expectedHost = new URL(invocationTarget).host
+  const invocationResourceUrl = invocationTarget;
+  let expectedHost = invocationTarget.includes(':') ? new URL(invocationTarget).host : undefined;
   if(typeof window !== 'undefined') {
     // eslint-disable-next-line no-undef
     expectedHost = window.location.host;
@@ -756,14 +756,14 @@ describe('verifyCapabilityInvocation', function() {
       // * special case hostnames like 'localhost'
       // * port numbers
       const allowedInvocationTargets = [
-      `http://localhost:8080`,
-      `http://localhost`,
-      `https://localhost`,
-      `https://test.org/foo/bar`,
-      ]
-      for (const invocationTarget of allowedInvocationTargets) {
+        `http://localhost:8080`,
+        `http://localhost`,
+        `https://localhost`,
+        `https://test.org/foo/bar`,
+      ];
+      for(const invocationTarget of allowedInvocationTargets) {
         it(`verifies zcaps with invocationTarget=${invocationTarget}`, async () => {
-          const context = await setup({...suiteType, invocationTarget})
+          const context = await setup({...suiteType, invocationTarget});
           const result = await verifyCapabilityInvocation({
             method: 'GET',
             ...context,
@@ -771,10 +771,52 @@ describe('verifyCapabilityInvocation', function() {
             expectedTarget: invocationTarget,
             headers: context.signed,
           });
-          if (result.error) throw result.error
-          should.equal(result.verified, true, `zcap should be verified`)
-        })
+          if(result.error) {
+            throw result.error;
+          }
+          should.equal(result.verified, true, `zcap should be verified`);
+        });
       }
+
+      it(`verifies zcap when expectedTarget is relative href, which defaults to https`, async () => {
+        const invocationTarget = `https://localhost:8080/foo/bar`;
+        const context = await setup({...suiteType, invocationTarget});
+        const result = await verifyCapabilityInvocation({
+          method: 'GET',
+          ...context,
+          // note: we are using the pathname here because
+          // it is a relative URL,
+          // even though the zcap is for the full URL,
+          // and we want to test that can still verify
+          url: new URL(invocationTarget).pathname,
+          expectedTarget: invocationTarget,
+          headers: context.signed,
+        });
+        if(result.error) {
+          throw result.error;
+        }
+        should.equal(result.verified, true, `zcap should be verified`);
+      });
+
+      it(`does not verify zcap when expectedTarget is relative href and zcap invocationTarget is not https`,
+        async () => {
+          const invocationTarget = `http://localhost:8080/foo/bar`;
+          const context = await setup({...suiteType, invocationTarget});
+          const result = await verifyCapabilityInvocation({
+            method: 'GET',
+            ...context,
+            // note: we are using the pathname here because
+            // it is a relative URL,
+            // even though the zcap is for the full URL,
+            // and we want to test that can still verify
+            url: new URL(invocationTarget).pathname,
+            expectedTarget: invocationTarget,
+            headers: context.signed,
+          });
+          should.not.equal(result.verified, true,
+            `zcap should not be verified`);
+          should.equal(result.error instanceof Error, true);
+        });
     });
   });
 });
