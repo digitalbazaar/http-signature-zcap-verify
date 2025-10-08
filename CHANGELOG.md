@@ -1,6 +1,6 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
-## 11.2.0 - 2025-mm-dd
+## 11.2.0 - 2025-10-08
 
 ### Added
 - Allow URL schemes other than `https` to be used in invocation target URLs.
