@@ -5,7 +5,7 @@ signatures
 
 ## Install
 
-- Browsers and Node.js 14+ are supported.
+- Browsers and Node.js 22+ are supported.
 - [Web Crypto API][] required. Older browsers and Node.js 14 must use a
   polyfill.
 
@@ -18,15 +18,11 @@ npm install @digitalbazaar/http-signature-zcap-verify
 ## Example "getVerifier" for "verifyCapabilityInvocation"
 
 ```js
-import {CryptoLD} from 'crypto-ld';
-import {Ed25519VerificationKey2020} from
-  '@digitalbazaar/ed25519-verification-key-2020';
-
-const cryptoLd = new CryptoLD();
-cryptoLd.use(Ed25519VerificationKey2020);
+import * as Ed25519Multikey from '@digitalbazaar/ed25519-multikey';
 
 async function getVerifier({keyId, documentLoader}) {
-  const key = await cryptoLd.fromKeyId({id: keyId, documentLoader});
+  const {document} = await documentLoader(keyId);
+  const key = await Ed25519Multikey.from(document);
   const verificationMethod = await key.export(
     {publicKey: true, includeContext: true});
   const verifier = key.verifier();
