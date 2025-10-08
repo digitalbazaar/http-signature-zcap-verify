@@ -1,6 +1,7 @@
 /*!
  * Copyright (c) 2020-2025 Digital Bazaar, Inc. All rights reserved.
  */
+import * as Ed25519Multikey from '@digitalbazaar/ed25519-multikey';
 import {createRootCapability} from '@digitalbazaar/zcap';
 import {CryptoLD} from 'crypto-ld';
 import {Ed25519Signature2020} from '@digitalbazaar/ed25519-signature-2020';
@@ -186,7 +187,7 @@ describe('verifyCapabilityInvocation', function() {
           should.not.exist(result);
           should.exist(error);
           error.message.should.contain('revoked');
-          error.message.should.contain(pastDate);
+          error.message.should.contain('Verification method has been revoked');
         });
 
       it('should THROW if no getVerifier', async function() {
@@ -331,7 +332,7 @@ describe('verifyCapabilityInvocation', function() {
           should.not.exist(result);
           should.exist(error);
           error.message.should.contain(
-            '"AESVerificationKey2001" is not installed.');
+            'Unsupported key type "AESVerificationKey2001"');
         });
 
       it('should NOT verify unless both content-type and digest are set',
@@ -673,7 +674,7 @@ describe('verifyCapabilityInvocation', function() {
             ...context,
             url: invocationTarget,
             expectedTarget: invocationTarget,
-            headers: context.signed,
+            headers: context.signed
           });
           if(result.error) {
             throw result.error;
@@ -695,7 +696,7 @@ describe('verifyCapabilityInvocation', function() {
           // and we want to test that can still verify
           url: new URL(invocationTarget).pathname,
           expectedTarget: invocationTarget,
-          headers: context.signed,
+          headers: context.signed
         });
         if(result.error) {
           throw result.error;
@@ -716,7 +717,7 @@ describe('verifyCapabilityInvocation', function() {
           // and we want to test that can still verify
           url: new URL(invocationTarget).pathname,
           expectedTarget: invocationTarget,
-          headers: context.signed,
+          headers: context.signed
         });
         should.not.equal(result.verified, true,
           `zcap should not be verified`);
@@ -732,15 +733,13 @@ async function _setup({
   const invocationResourceUrl = invocationTarget;
   let expectedHost = invocationTarget.includes(':') ?
     new URL(invocationTarget).host : undefined;
-  if(typeof window !== 'undefined') {
+  if(!expectedHost && typeof window !== 'undefined') {
     // eslint-disable-next-line no-undef
     expectedHost = window.location.host;
   }
-  // the tests will use a mock didKey.
-  keyPair = await cryptoLd.generate({
-    controller,
-    type,
-  });
+  // the tests will use a mock didKey
+  //keyPair = await Ed25519Multikey.generate({controller});
+  keyPair = await cryptoLd.generate({controller, type});
   const {id: keyId} = keyPair;
   const suite = new Suite({
     verificationMethod: keyId,
@@ -789,7 +788,11 @@ async function _setup({
     return securityDocumentLoader(uri);
   };
   const getVerifier = async ({keyId, documentLoader}) => {
-    const key = await cryptoLd.fromKeyId({id: keyId, documentLoader});
+    const {document} = await documentLoader(keyId);
+    const key = await Ed25519Multikey.from(document);
+    if(key.revoked) {
+      throw new Error('Verification method has been revoked.');
+    }
     const verificationMethod = await key.export(
       {publicKey: true, includeContext: true});
     const verifier = key.verifier();
