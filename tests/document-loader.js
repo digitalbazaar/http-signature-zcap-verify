@@ -3,7 +3,7 @@
  */
 import secCtx from '@digitalbazaar/security-context';
 import {securityLoader} from '@digitalbazaar/security-document-loader';
-import zcapCtx from 'zcap-context';
+import zcapCtx from '@digitalbazaar/zcap-context';
 
 const loader = securityLoader();
 loader.addStatic(zcapCtx.CONTEXT_URL, zcapCtx.CONTEXT);
