@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "@digitalbazaar/ed25519-signature-2020": "^5.0.0",
-    "@digitalbazaar/ed25519-verification-key-2020": "^4.0.0",
     "@digitalbazaar/http-signature-zcap-invoke": "^6.0.0",
     "@digitalbazaar/security-context": "^1.0.0",
     "@digitalbazaar/security-document-loader": "^2.0.0",
@@ -37,7 +36,6 @@
     "c8": "^9.1.0",
     "chai": "^4.3.6",
     "cross-env": "^7.0.3",
-    "crypto-ld": "^7.0.0",
     "eslint": "^8.17.0",
     "eslint-config-digitalbazaar": "^5.0.1",
     "eslint-plugin-jsdoc": "^48.2.2",

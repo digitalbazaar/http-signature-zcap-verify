@@ -3,10 +3,7 @@
  */
 import * as Ed25519Multikey from '@digitalbazaar/ed25519-multikey';
 import {createRootCapability} from '@digitalbazaar/zcap';
-import {CryptoLD} from 'crypto-ld';
 import {Ed25519Signature2020} from '@digitalbazaar/ed25519-signature-2020';
-import {Ed25519VerificationKey2020} from
-  '@digitalbazaar/ed25519-verification-key-2020';
 import {securityDocumentLoader} from './document-loader.js';
 import {signCapabilityInvocation} from
   '@digitalbazaar/http-signature-zcap-invoke';
@@ -15,12 +12,9 @@ import zcapCtx from 'zcap-context';
 
 const controller = 'did:test:controller';
 
-const cryptoLd = new CryptoLD();
-cryptoLd.use(Ed25519VerificationKey2020);
-
 const Ed25519 = {
-  type: 'Ed25519VerificationKey2020',
-  Suite: Ed25519Signature2020,
+  type: 'Ed25519Signature2020',
+  Suite: Ed25519Signature2020
 };
 
 const invocationResourceUrl = 'https://test.org/zcaps/foo';
@@ -30,7 +24,6 @@ let keyPair;
 
 describe('verifyCapabilityInvocation', function() {
   [Ed25519].forEach(function(suiteType) {
-
     describe(suiteType.type, function() {
       let suite;
       let documentLoader;
@@ -156,7 +149,7 @@ describe('verifyCapabilityInvocation', function() {
             .replace(/\.[0-9]{3}/, '');
           const _documentLoader = async url => {
             if(keyId === url) {
-              const doc = keyPair.export(
+              const doc = await keyPair.export(
                 {publicKey: true, includeContext: true});
               doc.revoked = pastDate;
               return {
@@ -728,7 +721,7 @@ describe('verifyCapabilityInvocation', function() {
 });
 
 async function _setup({
-  Suite, type, invocationTarget = invocationResourceUrl
+  Suite, invocationTarget = invocationResourceUrl
 }) {
   const invocationResourceUrl = invocationTarget;
   let expectedHost = invocationTarget.includes(':') ?
@@ -738,8 +731,7 @@ async function _setup({
     expectedHost = window.location.host;
   }
   // the tests will use a mock didKey
-  //keyPair = await Ed25519Multikey.generate({controller});
-  keyPair = await cryptoLd.generate({controller, type});
+  keyPair = await Ed25519Multikey.generate({controller});
   const {id: keyId} = keyPair;
   const suite = new Suite({
     verificationMethod: keyId,
@@ -771,7 +763,7 @@ async function _setup({
     // when we dereference the keyId for verification
     // all we need is the publicNode
     if(uri === keyId) {
-      const doc = keyPair.export({publicKey: true, includeContext: true});
+      const doc = await keyPair.export({publicKey: true, includeContext: true});
       return {
         contextUrl: null,
         documentUrl: uri,
