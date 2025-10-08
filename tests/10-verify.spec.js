@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2020-2022 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2020-2025 Digital Bazaar, Inc. All rights reserved.
  */
 import {createRootCapability} from '@digitalbazaar/zcap';
 import {CryptoLD} from 'crypto-ld';
@@ -27,103 +27,6 @@ const method = 'GET';
 
 let keyPair;
 
-const setup = async ({Suite, type, invocationTarget = invocationResourceUrl}) => {
-  const invocationResourceUrl = invocationTarget;
-  let expectedHost = invocationTarget.includes(':') ? new URL(invocationTarget).host : undefined;
-  if(typeof window !== 'undefined') {
-    // eslint-disable-next-line no-undef
-    expectedHost = window.location.host;
-  }
-  // the tests will use a mock didKey.
-  keyPair = await cryptoLd.generate({
-    controller,
-    type,
-  });
-  const {id: keyId} = keyPair;
-  const suite = new Suite({
-    verificationMethod: keyId,
-    key: keyPair
-  });
-
-  // this is the root zCap
-  const rootCapability = createRootCapability({
-    controller,
-    invocationTarget: invocationResourceUrl
-  });
-
-  const documentLoader = async uri => {
-    // the controller should return a didDocument
-    // with the ProofPurpose's term on it
-    // In this case that term is capabilityInvocation
-    if(uri === controller) {
-      const doc = {
-        id: controller,
-        '@context': zcapCtx.CONTEXT_URL,
-        capabilityInvocation: [keyId]
-      };
-      return {
-        contextUrl: null,
-        documentUrl: uri,
-        document: doc
-      };
-    }
-    // when we dereference the keyId for verification
-    // all we need is the publicNode
-    if(uri === keyId) {
-      const doc = keyPair.export({publicKey: true, includeContext: true});
-      return {
-        contextUrl: null,
-        documentUrl: uri,
-        document: doc
-      };
-    }
-    if(uri === rootCapability.id) {
-      return {
-        contextUrl: null,
-        documentUrl: uri,
-        document: rootCapability
-      };
-    }
-    return securityDocumentLoader(uri);
-  };
-  const getVerifier = async ({keyId, documentLoader}) => {
-    const key = await cryptoLd.fromKeyId({id: keyId, documentLoader});
-    const verificationMethod = await key.export(
-      {publicKey: true, includeContext: true});
-    const verifier = key.verifier();
-    return {verifier, verificationMethod};
-  };
-  const created = Date.now() - 1000;
-  // we need a signer just for the sign step
-  const invocationSigner = keyPair.signer();
-  invocationSigner.id = keyId;
-  const signed = await signCapabilityInvocation({
-    url: invocationResourceUrl,
-    method,
-    headers: {
-      keyId,
-      date: created
-    },
-    json: {foo: true},
-    invocationSigner,
-    capabilityAction: 'read'
-  });
-  // in browsers we need to set the host explicitly
-  signed.host = signed.host || expectedHost;
-  return {
-    expectedHost,
-    // method used in tests is always GET which maps to `read`
-    expectedAction: 'read',
-    expectedRootCapability: rootCapability.id,
-    keyId,
-    keyPair,
-    suite,
-    signed,
-    documentLoader,
-    getVerifier
-  };
-};
-
 describe('verifyCapabilityInvocation', function() {
   [Ed25519].forEach(function(suiteType) {
 
@@ -136,7 +39,6 @@ describe('verifyCapabilityInvocation', function() {
       let expectedHost;
       let expectedAction;
       let expectedRootCapability;
-
       beforeEach(async function() {
         ({
           expectedHost,
@@ -147,7 +49,7 @@ describe('verifyCapabilityInvocation', function() {
           keyId,
           getVerifier,
           signed
-        } = await setup(suiteType));
+        } = await _setup(suiteType));
       });
 
       it('should verify a valid request', async function() {
@@ -762,8 +664,10 @@ describe('verifyCapabilityInvocation', function() {
         `https://test.org/foo/bar`,
       ];
       for(const invocationTarget of allowedInvocationTargets) {
-        it(`verifies zcaps with invocationTarget=${invocationTarget}`, async () => {
-          const context = await setup({...suiteType, invocationTarget});
+        const testName =
+          `verifies zcaps with invocationTarget=${invocationTarget}`;
+        it(testName, async () => {
+          const context = await _setup({...suiteType, invocationTarget});
           const result = await verifyCapabilityInvocation({
             method: 'GET',
             ...context,
@@ -778,9 +682,10 @@ describe('verifyCapabilityInvocation', function() {
         });
       }
 
-      it(`verifies zcap when expectedTarget is relative href, which defaults to https`, async () => {
+      it('verifies zcap when expectedTarget is relative href, ' +
+        'which defaults to "https"', async () => {
         const invocationTarget = `https://localhost:8080/foo/bar`;
-        const context = await setup({...suiteType, invocationTarget});
+        const context = await _setup({...suiteType, invocationTarget});
         const result = await verifyCapabilityInvocation({
           method: 'GET',
           ...context,
@@ -798,25 +703,125 @@ describe('verifyCapabilityInvocation', function() {
         should.equal(result.verified, true, `zcap should be verified`);
       });
 
-      it(`does not verify zcap when expectedTarget is relative href and zcap invocationTarget is not https`,
-        async () => {
-          const invocationTarget = `http://localhost:8080/foo/bar`;
-          const context = await setup({...suiteType, invocationTarget});
-          const result = await verifyCapabilityInvocation({
-            method: 'GET',
-            ...context,
-            // note: we are using the pathname here because
-            // it is a relative URL,
-            // even though the zcap is for the full URL,
-            // and we want to test that can still verify
-            url: new URL(invocationTarget).pathname,
-            expectedTarget: invocationTarget,
-            headers: context.signed,
-          });
-          should.not.equal(result.verified, true,
-            `zcap should not be verified`);
-          should.equal(result.error instanceof Error, true);
+      it('does not verify zcap when expectedTarget is relative href ' +
+        'and zcap invocationTarget is not "https"', async () => {
+        const invocationTarget = `http://localhost:8080/foo/bar`;
+        const context = await _setup({...suiteType, invocationTarget});
+        const result = await verifyCapabilityInvocation({
+          method: 'GET',
+          ...context,
+          // note: we are using the pathname here because
+          // it is a relative URL,
+          // even though the zcap is for the full URL,
+          // and we want to test that can still verify
+          url: new URL(invocationTarget).pathname,
+          expectedTarget: invocationTarget,
+          headers: context.signed,
         });
+        should.not.equal(result.verified, true,
+          `zcap should not be verified`);
+        should.equal(result.error instanceof Error, true);
+      });
     });
   });
 });
+
+async function _setup({
+  Suite, type, invocationTarget = invocationResourceUrl
+}) {
+  const invocationResourceUrl = invocationTarget;
+  let expectedHost = invocationTarget.includes(':') ?
+    new URL(invocationTarget).host : undefined;
+  if(typeof window !== 'undefined') {
+    // eslint-disable-next-line no-undef
+    expectedHost = window.location.host;
+  }
+  // the tests will use a mock didKey.
+  keyPair = await cryptoLd.generate({
+    controller,
+    type,
+  });
+  const {id: keyId} = keyPair;
+  const suite = new Suite({
+    verificationMethod: keyId,
+    key: keyPair
+  });
+
+  // this is the root zCap
+  const rootCapability = createRootCapability({
+    controller,
+    invocationTarget: invocationResourceUrl
+  });
+
+  const documentLoader = async uri => {
+    // the controller should return a didDocument
+    // with the ProofPurpose's term on it
+    // In this case that term is capabilityInvocation
+    if(uri === controller) {
+      const doc = {
+        id: controller,
+        '@context': zcapCtx.CONTEXT_URL,
+        capabilityInvocation: [keyId]
+      };
+      return {
+        contextUrl: null,
+        documentUrl: uri,
+        document: doc
+      };
+    }
+    // when we dereference the keyId for verification
+    // all we need is the publicNode
+    if(uri === keyId) {
+      const doc = keyPair.export({publicKey: true, includeContext: true});
+      return {
+        contextUrl: null,
+        documentUrl: uri,
+        document: doc
+      };
+    }
+    if(uri === rootCapability.id) {
+      return {
+        contextUrl: null,
+        documentUrl: uri,
+        document: rootCapability
+      };
+    }
+    return securityDocumentLoader(uri);
+  };
+  const getVerifier = async ({keyId, documentLoader}) => {
+    const key = await cryptoLd.fromKeyId({id: keyId, documentLoader});
+    const verificationMethod = await key.export(
+      {publicKey: true, includeContext: true});
+    const verifier = key.verifier();
+    return {verifier, verificationMethod};
+  };
+  const created = Date.now() - 1000;
+  // we need a signer just for the sign step
+  const invocationSigner = keyPair.signer();
+  invocationSigner.id = keyId;
+  const signed = await signCapabilityInvocation({
+    url: invocationResourceUrl,
+    method,
+    headers: {
+      keyId,
+      date: created
+    },
+    json: {foo: true},
+    invocationSigner,
+    capabilityAction: 'read'
+  });
+  // in browsers we need to set the host explicitly
+  signed.host = signed.host || expectedHost;
+  return {
+    expectedHost,
+    // method used in tests is always GET which maps to `read`
+    expectedAction: 'read',
+    expectedRootCapability: rootCapability.id,
+    keyId,
+    keyPair,
+    suite,
+    signed,
+    documentLoader,
+    getVerifier
+  };
+}
