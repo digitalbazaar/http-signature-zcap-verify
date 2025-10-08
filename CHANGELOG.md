@@ -1,5 +1,16 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
+## 11.2.0 - 2025-mm-dd
+
+### Added
+- Allow URL schemes other than `https` to be used in invocation target URLs.
+
+### Changed
+- Eliminate dependencies in favor of native platform support for simple
+  (and rarely used) polyfill fallbacks which may be removed in future
+  versions. Dependencies removed:
+  - `base64url-universal`.
+
 ## 11.1.1 - 2024-04-02
 
 ### Fixed

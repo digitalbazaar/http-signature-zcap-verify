@@ -23,6 +23,9 @@ import * as Ed25519Multikey from '@digitalbazaar/ed25519-multikey';
 async function getVerifier({keyId, documentLoader}) {
   const {document} = await documentLoader(keyId);
   const key = await Ed25519Multikey.from(document);
+  if(key.revoked) {
+    throw new Error('Verification method has been revoked.');
+  }
   const verificationMethod = await key.export(
     {publicKey: true, includeContext: true});
   const verifier = key.verifier();
