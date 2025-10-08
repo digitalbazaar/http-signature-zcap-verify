@@ -8,7 +8,7 @@ import {securityDocumentLoader} from './document-loader.js';
 import {signCapabilityInvocation} from
   '@digitalbazaar/http-signature-zcap-invoke';
 import {verifyCapabilityInvocation} from '../lib/index.js';
-import zcapCtx from 'zcap-context';
+import zcapCtx from '@digitalbazaar/zcap-context';
 
 const controller = 'did:test:controller';
 
