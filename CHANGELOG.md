@@ -1,6 +1,6 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
-## 11.2.1 - 2025-09-dd
+## 11.2.1 - 2025-09-16
 
 ### Fixed
 - Fixed a regression where verification would fail if a relative url
