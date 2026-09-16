@@ -697,6 +697,31 @@ describe('verifyCapabilityInvocation', function() {
         should.equal(result.verified, true, `zcap should be verified`);
       });
 
+      it('verifies zcap when relative href has an unencoded colon',
+        async () => {
+          // an unencoded colon in the query is non-conformant but commonly
+          // allowed, so it must not be mistaken for an absolute URL
+          const invocationTarget =
+            'https://localhost:8080/foo/bar?date=03-20-2024%2000:00%20UTC';
+          const context = await _setup({...suiteType, invocationTarget});
+          const {pathname, search} = new URL(invocationTarget);
+          const result = await verifyCapabilityInvocation({
+            method: 'GET',
+            ...context,
+            // note: we are using the pathname and search here because
+            // it is a relative URL,
+            // even though the zcap is for the full URL,
+            // and we want to test that can still verify
+            url: `${pathname}${search}`,
+            expectedTarget: invocationTarget,
+            headers: context.signed
+          });
+          if(result.error) {
+            throw result.error;
+          }
+          should.equal(result.verified, true, `zcap should be verified`);
+        });
+
       it('does not verify zcap when expectedTarget is relative href ' +
         'and zcap invocationTarget is not "https"', async () => {
         const invocationTarget = `http://localhost:8080/foo/bar`;
