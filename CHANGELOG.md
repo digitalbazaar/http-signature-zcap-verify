@@ -1,5 +1,13 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
+## 11.2.1 - 2025-09-dd
+
+### Fixed
+- Fixed a regression where verification would fail if a relative url
+  containing an unencoded colon was passed to create the
+  `invocationTarget`. A url is now only considered absolute if it
+  starts with a scheme, which still allows schemes other than `https`.
+
 ## 11.2.0 - 2025-10-08
 
 ### Added
