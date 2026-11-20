@@ -1,6 +1,6 @@
 # @digitalbazaar/http-signature-zcap-verify ChangeLog
 
-## 11.2.2 - 2026-11-dd
+## 11.2.2 - 2026-11-20
 
 ### Changed
 - Update dependencies.
